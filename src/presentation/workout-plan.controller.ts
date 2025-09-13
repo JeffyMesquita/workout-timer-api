@@ -37,6 +37,10 @@ import {
   AddExerciseToWorkoutPlanUseCase,
   AddExerciseToWorkoutPlanInput,
 } from '../application/use-cases/add-exercise-to-workout-plan.usecase';
+import {
+  ListExercisesByPlanUseCase,
+  ListExercisesByPlanInput,
+} from '../application/use-cases/list-exercises-by-plan.usecase';
 import { WorkoutLimitExceededException } from '../domain/services/workout-limit.service';
 
 // DTOs
@@ -77,6 +81,7 @@ export class WorkoutPlanController {
     private readonly updateWorkoutPlanUseCase: UpdateWorkoutPlanUseCase,
     private readonly deleteWorkoutPlanUseCase: DeleteWorkoutPlanUseCase,
     private readonly addExerciseToWorkoutPlanUseCase: AddExerciseToWorkoutPlanUseCase,
+    private readonly listExercisesByPlanUseCase: ListExercisesByPlanUseCase,
   ) {}
 
   private getErrorMessage(error: unknown): string {
@@ -327,21 +332,32 @@ export class WorkoutPlanController {
   @Get(':id/exercises')
   async listExercises(@Req() req: any, @Param('id') planId: string) {
     try {
-      // TODO: Implementar ListExercisesByPlanUseCase
+      const input: ListExercisesByPlanInput = {
+        userId: req.user.id,
+        workoutPlanId: planId,
+      };
+
+      const result = await this.listExercisesByPlanUseCase.execute(input);
+
       return {
         success: true,
-        data: {
-          exercises: [],
-          planInfo: {
-            id: planId,
-            name: '',
-            exerciseCount: 0,
-          },
-        },
+        data: result,
         message: 'Exercícios do plano obtidos com sucesso',
       };
     } catch (error) {
       const errorMessage = this.getErrorMessage(error);
+
+      if (errorMessage.includes('não encontrado')) {
+        throw new HttpException(
+          {
+            success: false,
+            message: errorMessage,
+            code: 'WORKOUT_PLAN_NOT_FOUND',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
       throw new HttpException(
         {
           success: false,
