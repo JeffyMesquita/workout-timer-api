@@ -17,6 +17,26 @@ import {
   CreateWorkoutPlanUseCase,
   CreateWorkoutPlanInput,
 } from '../application/use-cases/create-workout-plan.usecase';
+import {
+  ListWorkoutPlansUseCase,
+  ListWorkoutPlansInput,
+} from '../application/use-cases/list-workout-plans.usecase';
+import {
+  GetWorkoutPlanByIdUseCase,
+  GetWorkoutPlanByIdInput,
+} from '../application/use-cases/get-workout-plan-by-id.usecase';
+import {
+  UpdateWorkoutPlanUseCase,
+  UpdateWorkoutPlanInput,
+} from '../application/use-cases/update-workout-plan.usecase';
+import {
+  DeleteWorkoutPlanUseCase,
+  DeleteWorkoutPlanInput,
+} from '../application/use-cases/delete-workout-plan.usecase';
+import {
+  AddExerciseToWorkoutPlanUseCase,
+  AddExerciseToWorkoutPlanInput,
+} from '../application/use-cases/add-exercise-to-workout-plan.usecase';
 import { WorkoutLimitExceededException } from '../domain/services/workout-limit.service';
 
 // DTOs
@@ -38,13 +58,26 @@ export class WorkoutPlanQueryDto {
   includeInactive?: boolean = false;
 }
 
+export class AddExerciseDto {
+  name!: string;
+  description?: string;
+  targetMuscleGroup?: string;
+  sets?: number = 3;
+  reps?: number = 10;
+  restTimeSeconds?: number = 60;
+}
+
 @Controller('workout-plans')
 @UseGuards(JwtAuthGuard)
 export class WorkoutPlanController {
   constructor(
     private readonly createWorkoutPlanUseCase: CreateWorkoutPlanUseCase,
-  ) // Outros use cases serão injetados aqui conforme implementarmos
-  {}
+    private readonly listWorkoutPlansUseCase: ListWorkoutPlansUseCase,
+    private readonly getWorkoutPlanByIdUseCase: GetWorkoutPlanByIdUseCase,
+    private readonly updateWorkoutPlanUseCase: UpdateWorkoutPlanUseCase,
+    private readonly deleteWorkoutPlanUseCase: DeleteWorkoutPlanUseCase,
+    private readonly addExerciseToWorkoutPlanUseCase: AddExerciseToWorkoutPlanUseCase,
+  ) {}
 
   private getErrorMessage(error: unknown): string {
     return error instanceof Error ? error.message : 'Erro desconhecido';
@@ -106,18 +139,19 @@ export class WorkoutPlanController {
   @Get()
   async list(@Req() req: any, @Query() query: WorkoutPlanQueryDto) {
     try {
-      // TODO: Implementar ListWorkoutPlansUseCase
+      const input: ListWorkoutPlansInput = {
+        userId: req.user.id,
+        page: query.page || 1,
+        limit: query.limit || 10,
+        search: query.search,
+        includeInactive: query.includeInactive || false,
+      };
+
+      const result = await this.listWorkoutPlansUseCase.execute(input);
+
       return {
         success: true,
-        data: {
-          plans: [],
-          pagination: {
-            page: query.page,
-            limit: query.limit,
-            total: 0,
-            totalPages: 0,
-          },
-        },
+        data: result,
         message: 'Lista de planos de treino obtida com sucesso',
       };
     } catch (error) {
@@ -136,10 +170,16 @@ export class WorkoutPlanController {
   @Get(':id')
   async getById(@Req() req: any, @Param('id') id: string) {
     try {
-      // TODO: Implementar GetWorkoutPlanByIdUseCase
+      const input: GetWorkoutPlanByIdInput = {
+        userId: req.user.id,
+        planId: id,
+      };
+
+      const result = await this.getWorkoutPlanByIdUseCase.execute(input);
+
       return {
         success: true,
-        data: null,
+        data: result,
         message: 'Plano de treino obtido com sucesso',
       };
     } catch (error) {
@@ -174,10 +214,19 @@ export class WorkoutPlanController {
     @Body() dto: UpdateWorkoutPlanDto,
   ) {
     try {
-      // TODO: Implementar UpdateWorkoutPlanUseCase
+      const input: UpdateWorkoutPlanInput = {
+        userId: req.user.id,
+        planId: id,
+        name: dto.name,
+        description: dto.description,
+        isActive: dto.isActive,
+      };
+
+      const result = await this.updateWorkoutPlanUseCase.execute(input);
+
       return {
         success: true,
-        data: null,
+        data: result,
         message: 'Plano de treino atualizado com sucesso',
       };
     } catch (error) {
@@ -217,12 +266,24 @@ export class WorkoutPlanController {
   }
 
   @Delete(':id')
-  async delete(@Req() req: any, @Param('id') id: string) {
+  async delete(
+    @Req() req: any,
+    @Param('id') id: string,
+    @Query('force') force?: string,
+  ) {
     try {
-      // TODO: Implementar DeleteWorkoutPlanUseCase
+      const input: DeleteWorkoutPlanInput = {
+        userId: req.user.id,
+        planId: id,
+        force: force === 'true',
+      };
+
+      const result = await this.deleteWorkoutPlanUseCase.execute(input);
+
       return {
         success: true,
-        message: 'Plano de treino removido com sucesso',
+        data: result,
+        message: result.message,
       };
     } catch (error) {
       const errorMessage = this.getErrorMessage(error);
@@ -238,7 +299,10 @@ export class WorkoutPlanController {
         );
       }
 
-      if (errorMessage.includes('em uso')) {
+      if (
+        errorMessage.includes('exercícios') ||
+        errorMessage.includes('em uso')
+      ) {
         throw new HttpException(
           {
             success: false,
@@ -293,13 +357,25 @@ export class WorkoutPlanController {
   async addExercise(
     @Req() req: any,
     @Param('id') planId: string,
-    @Body() exerciseDto: any,
+    @Body() exerciseDto: AddExerciseDto,
   ) {
     try {
-      // TODO: Implementar AddExerciseToPlanUseCase
+      const input: AddExerciseToWorkoutPlanInput = {
+        userId: req.user.id,
+        workoutPlanId: planId,
+        name: exerciseDto.name,
+        description: exerciseDto.description,
+        targetMuscleGroup: exerciseDto.targetMuscleGroup,
+        sets: exerciseDto.sets,
+        reps: exerciseDto.reps,
+        restTimeSeconds: exerciseDto.restTimeSeconds,
+      };
+
+      const result = await this.addExerciseToWorkoutPlanUseCase.execute(input);
+
       return {
         success: true,
-        data: null,
+        data: result,
         message: 'Exercício adicionado ao plano com sucesso',
       };
     } catch (error) {
@@ -316,6 +392,40 @@ export class WorkoutPlanController {
       }
 
       const errorMessage = this.getErrorMessage(error);
+
+      if (errorMessage.includes('não encontrado')) {
+        throw new HttpException(
+          {
+            success: false,
+            message: errorMessage,
+            code: 'WORKOUT_PLAN_NOT_FOUND',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      if (errorMessage.includes('já existe')) {
+        throw new HttpException(
+          {
+            success: false,
+            message: errorMessage,
+            code: 'DUPLICATE_EXERCISE_NAME',
+          },
+          HttpStatus.CONFLICT,
+        );
+      }
+
+      if (errorMessage.includes('inativo')) {
+        throw new HttpException(
+          {
+            success: false,
+            message: errorMessage,
+            code: 'INACTIVE_WORKOUT_PLAN',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
       throw new HttpException(
         {
           success: false,

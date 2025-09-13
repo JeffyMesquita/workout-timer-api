@@ -16,6 +16,12 @@ import { ActivateSubscriptionUseCase } from './application/use-cases/activate-su
 import { RestoreSubscriptionUseCase } from './application/use-cases/restore-subscription.usecase';
 import { CheckPremiumStatusUseCase } from './application/use-cases/check-premium-status.usecase';
 import { CreateWorkoutPlanUseCase } from './application/use-cases/create-workout-plan.usecase';
+import { ListWorkoutPlansUseCase } from './application/use-cases/list-workout-plans.usecase';
+import { GetWorkoutPlanByIdUseCase } from './application/use-cases/get-workout-plan-by-id.usecase';
+import { UpdateWorkoutPlanUseCase } from './application/use-cases/update-workout-plan.usecase';
+import { DeleteWorkoutPlanUseCase } from './application/use-cases/delete-workout-plan.usecase';
+import { AddExerciseToWorkoutPlanUseCase } from './application/use-cases/add-exercise-to-workout-plan.usecase';
+import { PrismaExerciseRepository } from './infrastructure/database/repositories/prisma-exercise.repository';
 import { WorkoutLimitServiceImpl } from './domain/services/workout-limit.service';
 
 @Module({
@@ -37,6 +43,10 @@ import { WorkoutLimitServiceImpl } from './domain/services/workout-limit.service
       useClass: PrismaWorkoutPlanRepository,
     },
     {
+      provide: 'ExerciseRepository',
+      useClass: PrismaExerciseRepository,
+    },
+    {
       provide: 'WorkoutLimitService',
       useClass: WorkoutLimitServiceImpl,
     },
@@ -44,6 +54,11 @@ import { WorkoutLimitServiceImpl } from './domain/services/workout-limit.service
     RestoreSubscriptionUseCase,
     CheckPremiumStatusUseCase,
     CreateWorkoutPlanUseCase,
+    ListWorkoutPlansUseCase,
+    GetWorkoutPlanByIdUseCase,
+    UpdateWorkoutPlanUseCase,
+    DeleteWorkoutPlanUseCase,
+    AddExerciseToWorkoutPlanUseCase,
   ],
 })
 export class AppModule {}
