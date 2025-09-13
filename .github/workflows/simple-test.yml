@@ -1,0 +1,23 @@
+name: 🚀 Simple Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - run: pnpm install
+      - run: echo 'DATABASE_URL="postgresql://temp:temp@temp:5432/temp"' > .env
+      - run: pnpm prisma generate
+      - run: rm .env
+      - run: pnpm test:unit
+      - run: echo "✅ Tests passed!"

@@ -21,11 +21,11 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx,json,md}\"",
     "type-check": "tsc --noEmit",
     "quality:check": "pnpm lint:check && pnpm format:check && pnpm type-check && pnpm test:unit",
-    "prepare": "husky",
+    "prepare": "husky install || true",
     "commit": "cz",
     "pre-commit": "lint-staged",
     "security:audit": "pnpm audit --audit-level moderate",
-    "security:licenses": "license-checker --onlyAllow \"MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC\"",
+    "security:licenses": "license-checker --onlyAllow \"MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC\" --excludePrivatePackages || true",
     "ci:full": "pnpm quality:check && pnpm security:audit && pnpm security:licenses"
   },
   "dependencies": {

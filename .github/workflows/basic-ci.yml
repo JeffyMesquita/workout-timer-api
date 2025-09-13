@@ -1,0 +1,48 @@
+name: ✅ Basic CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  test:
+    name: 🧪 Test & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '9'
+
+      - name: 📥 Install dependencies
+        run: pnpm install
+
+      - name: 🔧 Generate Prisma
+        run: |
+          echo 'DATABASE_URL="postgresql://temp:temp@temp:5432/temp"' > .env
+          pnpm prisma generate
+          rm .env
+
+      - name: 🔍 Type check
+        run: pnpm run type-check
+
+      - name: 🧪 Run tests
+        run: pnpm run test:unit
+
+      - name: 🏗️ Build
+        run: pnpm run build
+
+      - name: ✅ Success
+        run: echo "🎉 All checks passed!"
