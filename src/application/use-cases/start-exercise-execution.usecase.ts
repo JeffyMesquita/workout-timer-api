@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { WorkoutSessionRepository } from '../../domain/repositories/workout-session.repository';
+
+import { ExerciseExecution } from '../../domain/entities/exercise-execution.entity';
+import { WorkoutSet } from '../../domain/entities/set.entity';
 import { ExerciseExecutionRepository } from '../../domain/repositories/exercise-execution.repository';
 import { SetRepository } from '../../domain/repositories/set.repository';
 import { WorkoutPlanRepository } from '../../domain/repositories/workout-plan.repository';
-import { ExerciseExecution } from '../../domain/entities/exercise-execution.entity';
-import { WorkoutSet } from '../../domain/entities/set.entity';
+import { WorkoutSessionRepository } from '../../domain/repositories/workout-session.repository';
 
 export interface StartExerciseExecutionInput {
   userId: string;
@@ -64,20 +65,17 @@ export class StartExerciseExecutionUseCase {
     private readonly workoutPlanRepository: WorkoutPlanRepository,
   ) {}
 
-  async execute(
-    input: StartExerciseExecutionInput,
-  ): Promise<StartExerciseExecutionOutput> {
+  async execute(input: StartExerciseExecutionInput): Promise<StartExerciseExecutionOutput> {
     const { userId, workoutSessionId, exerciseId, startingWeight } = input;
 
     // Validar entrada
     this.validateInput(input);
 
     // Verificar se a sessão existe e pertence ao usuário
-    const workoutSession =
-      await this.workoutSessionRepository.findByIdAndUserId(
-        workoutSessionId,
-        userId,
-      );
+    const workoutSession = await this.workoutSessionRepository.findByIdAndUserId(
+      workoutSessionId,
+      userId,
+    );
 
     if (!workoutSession) {
       throw new Error('Sessão de treino não encontrada');
@@ -88,9 +86,7 @@ export class StartExerciseExecutionUseCase {
     }
 
     // Buscar o plano de treino para obter informações do exercício
-    const workoutPlan = await this.workoutPlanRepository.findById(
-      workoutSession.workoutPlanId,
-    );
+    const workoutPlan = await this.workoutPlanRepository.findById(workoutSession.workoutPlanId);
 
     if (!workoutPlan) {
       throw new Error('Plano de treino não encontrado');
@@ -154,9 +150,7 @@ export class StartExerciseExecutionUseCase {
     }
 
     // Salvar a execução
-    const savedExecution = await this.exerciseExecutionRepository.save(
-      exerciseExecution,
-    );
+    const savedExecution = await this.exerciseExecutionRepository.save(exerciseExecution);
 
     // Salvar as séries
     await this.setRepository.saveMany(sets);

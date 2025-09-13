@@ -1,4 +1,4 @@
-import { ExerciseExecution } from '../entities/exercise-execution.entity';
+import type { ExerciseExecution } from '../entities/exercise-execution.entity';
 
 export interface ExerciseExecutionRepository {
   /**
@@ -9,9 +9,7 @@ export interface ExerciseExecutionRepository {
   /**
    * Busca execuções por sessão de treino
    */
-  findByWorkoutSessionId(
-    workoutSessionId: string,
-  ): Promise<ExerciseExecution[]>;
+  findByWorkoutSessionId(workoutSessionId: string): Promise<ExerciseExecution[]>;
 
   /**
    * Busca execução específica de um exercício em uma sessão
@@ -29,9 +27,7 @@ export interface ExerciseExecutionRepository {
   /**
    * Busca execuções ativas (em progresso)
    */
-  findActiveByWorkoutSessionId(
-    workoutSessionId: string,
-  ): Promise<ExerciseExecution[]>;
+  findActiveByWorkoutSessionId(workoutSessionId: string): Promise<ExerciseExecution[]>;
 
   /**
    * Salva uma execução (create ou update)
@@ -46,10 +42,7 @@ export interface ExerciseExecutionRepository {
   /**
    * Conta execuções por status
    */
-  countByWorkoutSessionIdAndStatus(
-    workoutSessionId: string,
-    status: string,
-  ): Promise<number>;
+  countByWorkoutSessionIdAndStatus(workoutSessionId: string, status: string): Promise<number>;
 
   /**
    * Busca última execução de um exercício específico

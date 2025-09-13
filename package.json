@@ -14,7 +14,19 @@
     "test:integration": "jest --testPathPattern=.*\\.integration\\.spec\\.ts",
     "test:e2e": "jest --testPathPattern=.*\\.e2e\\.spec\\.ts",
     "test:coverage": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",
+    "lint:check": "eslint \"src/**/*.{ts,tsx}\"",
+    "format": "prettier --write \"src/**/*.{ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,json,md}\"",
+    "type-check": "tsc --noEmit",
+    "quality:check": "pnpm lint:check && pnpm format:check && pnpm type-check && pnpm test:unit",
+    "prepare": "husky",
+    "commit": "cz",
+    "pre-commit": "lint-staged",
+    "security:audit": "pnpm audit --audit-level moderate",
+    "security:licenses": "license-checker --onlyAllow \"MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC\"",
+    "ci:full": "pnpm quality:check && pnpm security:audit && pnpm security:licenses"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -48,7 +60,39 @@
     "@types/jsonwebtoken": "^9.0.2",
     "@types/passport-jwt": "^3.0.9",
     "supertest": "^7.0.0",
-    "@types/supertest": "^2.0.12"
+    "@types/supertest": "^2.0.12",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-unused-imports": "^3.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@eslint/js": "^9.0.0",
+    "typescript-eslint": "^8.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0",
+    "commitizen": "^4.3.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "license-checker": "^25.0.1",
+    "globals": "^15.0.0"
   },
-  "packageManager": "pnpm@10.0.0+sha512.b8fef5494bd3fe4cbd4edabd0745df2ee5be3e4b0b8b08fa643aa3e4c6702ccc0f00d68fa8a8c9858a735a0032485a44990ed2810526c875e416f001b17df12b"
+  "packageManager": "pnpm@10.0.0+sha512.b8fef5494bd3fe4cbd4edabd0745df2ee5be3e4b0b8b08fa643aa3e4c6702ccc0f00d68fa8a8c9858a735a0032485a44990ed2810526c875e416f001b17df12b",
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write",
+      "git add"
+    ],
+    "src/**/*.{json,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  }
 }

@@ -115,21 +115,15 @@ export class WorkoutLimits {
    */
   private validateLimits(): void {
     if (this.maxWorkoutPlans < -1 || this.maxWorkoutPlans === 0) {
-      throw new Error(
-        'Max workout plans must be -1 (unlimited) or greater than 0',
-      );
+      throw new Error('Max workout plans must be -1 (unlimited) or greater than 0');
     }
 
     if (this.maxExercisesPerPlan < -1 || this.maxExercisesPerPlan === 0) {
-      throw new Error(
-        'Max exercises per plan must be -1 (unlimited) or greater than 0',
-      );
+      throw new Error('Max exercises per plan must be -1 (unlimited) or greater than 0');
     }
 
     if (this.historyRetentionDays < -1 || this.historyRetentionDays === 0) {
-      throw new Error(
-        'History retention days must be -1 (unlimited) or greater than 0',
-      );
+      throw new Error('History retention days must be -1 (unlimited) or greater than 0');
     }
   }
 

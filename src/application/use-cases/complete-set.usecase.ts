@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+
 import { ExerciseExecutionRepository } from '../../domain/repositories/exercise-execution.repository';
 import { SetRepository } from '../../domain/repositories/set.repository';
 
@@ -50,23 +51,14 @@ export class CompleteSetUseCase {
   ) {}
 
   async execute(input: CompleteSetInput): Promise<CompleteSetOutput> {
-    const {
-      userId,
-      exerciseExecutionId,
-      setNumber,
-      actualReps,
-      weight,
-      restTimeSeconds,
-      notes,
-    } = input;
+    const { userId, exerciseExecutionId, setNumber, actualReps, weight, restTimeSeconds, notes } =
+      input;
 
     // Validar entrada
     this.validateInput(input);
 
     // Buscar a execução do exercício
-    const exerciseExecution = await this.exerciseExecutionRepository.findById(
-      exerciseExecutionId,
-    );
+    const exerciseExecution = await this.exerciseExecutionRepository.findById(exerciseExecutionId);
 
     if (!exerciseExecution) {
       throw new Error('Execução de exercício não encontrada');
@@ -155,10 +147,7 @@ export class CompleteSetUseCase {
       throw new Error('User ID é obrigatório');
     }
 
-    if (
-      !input.exerciseExecutionId ||
-      input.exerciseExecutionId.trim().length === 0
-    ) {
+    if (!input.exerciseExecutionId || input.exerciseExecutionId.trim().length === 0) {
       throw new Error('Exercise Execution ID é obrigatório');
     }
 

@@ -1,8 +1,9 @@
-import { CompleteSetUseCase } from '../complete-set.usecase';
-import { ExerciseExecutionRepository } from '../../../domain/repositories/exercise-execution.repository';
-import { SetRepository } from '../../../domain/repositories/set.repository';
 import { ExerciseExecution } from '../../../domain/entities/exercise-execution.entity';
 import { WorkoutSet } from '../../../domain/entities/set.entity';
+import { CompleteSetUseCase } from '../complete-set.usecase';
+
+import type { ExerciseExecutionRepository } from '../../../domain/repositories/exercise-execution.repository';
+import type { SetRepository } from '../../../domain/repositories/set.repository';
 
 describe('CompleteSetUseCase', () => {
   let useCase: CompleteSetUseCase;
@@ -39,10 +40,7 @@ describe('CompleteSetUseCase', () => {
       deleteByExerciseExecutionId: jest.fn(),
     };
 
-    useCase = new CompleteSetUseCase(
-      mockExerciseExecutionRepository,
-      mockSetRepository,
-    );
+    useCase = new CompleteSetUseCase(mockExerciseExecutionRepository, mockSetRepository);
   });
 
   describe('execute', () => {
@@ -85,12 +83,8 @@ describe('CompleteSetUseCase', () => {
       // Add set to execution for proper testing
       exerciseExecution.addSet(set);
 
-      mockExerciseExecutionRepository.findById.mockResolvedValue(
-        exerciseExecution,
-      );
-      mockSetRepository.findByExerciseExecutionIdAndSetNumber.mockResolvedValue(
-        set,
-      );
+      mockExerciseExecutionRepository.findById.mockResolvedValue(exerciseExecution);
+      mockSetRepository.findByExerciseExecutionIdAndSetNumber.mockResolvedValue(set);
 
       mockSetRepository.save.mockImplementation(async (setToSave) => setToSave);
       mockExerciseExecutionRepository.save.mockResolvedValue(exerciseExecution);
@@ -113,9 +107,7 @@ describe('CompleteSetUseCase', () => {
       expect(result.restTimeSeconds).toBeDefined();
 
       expect(mockSetRepository.save).toHaveBeenCalledWith(set);
-      expect(mockExerciseExecutionRepository.save).toHaveBeenCalledWith(
-        exerciseExecution,
-      );
+      expect(mockExerciseExecutionRepository.save).toHaveBeenCalledWith(exerciseExecution);
     });
 
     it('should throw error for non-existent execution', async () => {
@@ -134,9 +126,7 @@ describe('CompleteSetUseCase', () => {
         'COMPLETED',
       );
 
-      mockExerciseExecutionRepository.findById.mockResolvedValue(
-        inactiveExecution,
-      );
+      mockExerciseExecutionRepository.findById.mockResolvedValue(inactiveExecution);
 
       await expect(useCase.execute(validInput)).rejects.toThrow(
         'Não é possível completar série de uma execução inativa',
@@ -152,16 +142,10 @@ describe('CompleteSetUseCase', () => {
         new Date(),
       );
 
-      mockExerciseExecutionRepository.findById.mockResolvedValue(
-        exerciseExecution,
-      );
-      mockSetRepository.findByExerciseExecutionIdAndSetNumber.mockResolvedValue(
-        null,
-      );
+      mockExerciseExecutionRepository.findById.mockResolvedValue(exerciseExecution);
+      mockSetRepository.findByExerciseExecutionIdAndSetNumber.mockResolvedValue(null);
 
-      await expect(useCase.execute(validInput)).rejects.toThrow(
-        'Série 1 não encontrada',
-      );
+      await expect(useCase.execute(validInput)).rejects.toThrow('Série 1 não encontrada');
     });
 
     it('should throw error for already completed set', async () => {
@@ -185,16 +169,10 @@ describe('CompleteSetUseCase', () => {
         null,
       );
 
-      mockExerciseExecutionRepository.findById.mockResolvedValue(
-        exerciseExecution,
-      );
-      mockSetRepository.findByExerciseExecutionIdAndSetNumber.mockResolvedValue(
-        completedSet,
-      );
+      mockExerciseExecutionRepository.findById.mockResolvedValue(exerciseExecution);
+      mockSetRepository.findByExerciseExecutionIdAndSetNumber.mockResolvedValue(completedSet);
 
-      await expect(useCase.execute(validInput)).rejects.toThrow(
-        'Série 1 já foi completada',
-      );
+      await expect(useCase.execute(validInput)).rejects.toThrow('Série 1 já foi completada');
     });
 
     it('should calculate weight suggestions correctly', async () => {
@@ -212,12 +190,8 @@ describe('CompleteSetUseCase', () => {
       exerciseExecution.addSet(set1);
       exerciseExecution.addSet(set2);
 
-      mockExerciseExecutionRepository.findById.mockResolvedValue(
-        exerciseExecution,
-      );
-      mockSetRepository.findByExerciseExecutionIdAndSetNumber.mockResolvedValue(
-        set1,
-      );
+      mockExerciseExecutionRepository.findById.mockResolvedValue(exerciseExecution);
+      mockSetRepository.findByExerciseExecutionIdAndSetNumber.mockResolvedValue(set1);
       mockSetRepository.save.mockResolvedValue(set1);
       mockExerciseExecutionRepository.save.mockResolvedValue(exerciseExecution);
 
@@ -242,9 +216,7 @@ describe('CompleteSetUseCase', () => {
         actualReps: 10,
       };
 
-      await expect(useCase.execute(invalidInput)).rejects.toThrow(
-        'User ID é obrigatório',
-      );
+      await expect(useCase.execute(invalidInput)).rejects.toThrow('User ID é obrigatório');
     });
 
     it('should throw error for invalid set number', async () => {

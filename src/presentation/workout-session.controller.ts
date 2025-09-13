@@ -11,11 +11,7 @@ import {
   HttpStatus,
   HttpException,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../infrastructure/auth/jwt.guard';
-import {
-  StartWorkoutSessionUseCase,
-  StartWorkoutSessionInput,
-} from '../application/use-cases/start-workout-session.usecase';
+
 import {
   PauseWorkoutSessionUseCase,
   ResumeWorkoutSessionUseCase,
@@ -24,6 +20,11 @@ import {
   ResumeWorkoutSessionInput,
   CompleteWorkoutSessionInput,
 } from '../application/use-cases/control-workout-session.usecase';
+import {
+  StartWorkoutSessionUseCase,
+  StartWorkoutSessionInput,
+} from '../application/use-cases/start-workout-session.usecase';
+import { JwtAuthGuard } from '../infrastructure/auth/jwt.guard';
 
 // DTOs
 export class StartWorkoutSessionDto {

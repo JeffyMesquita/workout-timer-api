@@ -31,23 +31,23 @@ describe('WorkoutSet', () => {
     });
 
     it('should validate set number on creation', () => {
-      expect(() => 
-        new WorkoutSet('set-1', 'exec-1', 0, 10)
-      ).toThrow('Set number must be between 1 and 20');
+      expect(() => new WorkoutSet('set-1', 'exec-1', 0, 10)).toThrow(
+        'Set number must be between 1 and 20',
+      );
 
-      expect(() => 
-        new WorkoutSet('set-1', 'exec-1', 21, 10)
-      ).toThrow('Set number must be between 1 and 20');
+      expect(() => new WorkoutSet('set-1', 'exec-1', 21, 10)).toThrow(
+        'Set number must be between 1 and 20',
+      );
     });
 
     it('should validate planned reps on creation', () => {
-      expect(() => 
-        new WorkoutSet('set-1', 'exec-1', 1, 0)
-      ).toThrow('Planned reps must be between 1 and 100');
+      expect(() => new WorkoutSet('set-1', 'exec-1', 1, 0)).toThrow(
+        'Planned reps must be between 1 and 100',
+      );
 
-      expect(() => 
-        new WorkoutSet('set-1', 'exec-1', 1, 101)
-      ).toThrow('Planned reps must be between 1 and 100');
+      expect(() => new WorkoutSet('set-1', 'exec-1', 1, 101)).toThrow(
+        'Planned reps must be between 1 and 100',
+      );
     });
   });
 
@@ -72,23 +72,15 @@ describe('WorkoutSet', () => {
     });
 
     it('should validate actual reps', () => {
-      expect(() => workoutSet.complete(-1)).toThrow(
-        'Actual reps must be between 0 and 100',
-      );
+      expect(() => workoutSet.complete(-1)).toThrow('Actual reps must be between 0 and 100');
 
-      expect(() => workoutSet.complete(101)).toThrow(
-        'Actual reps must be between 0 and 100',
-      );
+      expect(() => workoutSet.complete(101)).toThrow('Actual reps must be between 0 and 100');
     });
 
     it('should validate weight', () => {
-      expect(() => workoutSet.complete(10, -1)).toThrow(
-        'Weight must be between 0 and 1000 kg',
-      );
+      expect(() => workoutSet.complete(10, -1)).toThrow('Weight must be between 0 and 1000 kg');
 
-      expect(() => workoutSet.complete(10, 1001)).toThrow(
-        'Weight must be between 0 and 1000 kg',
-      );
+      expect(() => workoutSet.complete(10, 1001)).toThrow('Weight must be between 0 and 1000 kg');
     });
 
     it('should validate rest time', () => {
@@ -110,9 +102,7 @@ describe('WorkoutSet', () => {
     });
 
     it('should validate weight', () => {
-      expect(() => workoutSet.updateWeight(-1)).toThrow(
-        'Weight must be between 0 and 1000 kg',
-      );
+      expect(() => workoutSet.updateWeight(-1)).toThrow('Weight must be between 0 and 1000 kg');
     });
   });
 
@@ -124,9 +114,7 @@ describe('WorkoutSet', () => {
     });
 
     it('should validate reps', () => {
-      expect(() => workoutSet.updateReps(-1)).toThrow(
-        'Actual reps must be between 0 and 100',
-      );
+      expect(() => workoutSet.updateReps(-1)).toThrow('Actual reps must be between 0 and 100');
     });
   });
 
@@ -350,7 +338,7 @@ describe('WorkoutSet', () => {
   describe('clone', () => {
     it('should create a copy with new IDs', () => {
       workoutSet.weight = 50;
-      
+
       const cloned = workoutSet.clone('new-set-id', 'new-execution-id');
 
       expect(cloned.id).toBe('new-set-id');
@@ -363,4 +351,3 @@ describe('WorkoutSet', () => {
     });
   });
 });
-

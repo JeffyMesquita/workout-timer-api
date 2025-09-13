@@ -44,39 +44,39 @@ describe('Exercise', () => {
     });
 
     it('should validate sets on creation', () => {
-      expect(
-        () => new Exercise('ex-1', 'plan-1', 'Test', null, null, 0, 10, 60, 1),
-      ).toThrow('Sets must be between 1 and 20');
+      expect(() => new Exercise('ex-1', 'plan-1', 'Test', null, null, 0, 10, 60, 1)).toThrow(
+        'Sets must be between 1 and 20',
+      );
 
-      expect(
-        () => new Exercise('ex-1', 'plan-1', 'Test', null, null, 21, 10, 60, 1),
-      ).toThrow('Sets must be between 1 and 20');
+      expect(() => new Exercise('ex-1', 'plan-1', 'Test', null, null, 21, 10, 60, 1)).toThrow(
+        'Sets must be between 1 and 20',
+      );
     });
 
     it('should validate reps on creation', () => {
-      expect(
-        () => new Exercise('ex-1', 'plan-1', 'Test', null, null, 3, 0, 60, 1),
-      ).toThrow('Reps must be between 1 and 100');
+      expect(() => new Exercise('ex-1', 'plan-1', 'Test', null, null, 3, 0, 60, 1)).toThrow(
+        'Reps must be between 1 and 100',
+      );
 
-      expect(
-        () => new Exercise('ex-1', 'plan-1', 'Test', null, null, 3, 101, 60, 1),
-      ).toThrow('Reps must be between 1 and 100');
+      expect(() => new Exercise('ex-1', 'plan-1', 'Test', null, null, 3, 101, 60, 1)).toThrow(
+        'Reps must be between 1 and 100',
+      );
     });
 
     it('should validate rest time on creation', () => {
-      expect(
-        () => new Exercise('ex-1', 'plan-1', 'Test', null, null, 3, 10, -1, 1),
-      ).toThrow('Rest time must be between 0 and 600 seconds');
+      expect(() => new Exercise('ex-1', 'plan-1', 'Test', null, null, 3, 10, -1, 1)).toThrow(
+        'Rest time must be between 0 and 600 seconds',
+      );
 
-      expect(
-        () => new Exercise('ex-1', 'plan-1', 'Test', null, null, 3, 10, 601, 1),
-      ).toThrow('Rest time must be between 0 and 600 seconds');
+      expect(() => new Exercise('ex-1', 'plan-1', 'Test', null, null, 3, 10, 601, 1)).toThrow(
+        'Rest time must be between 0 and 600 seconds',
+      );
     });
 
     it('should validate order on creation', () => {
-      expect(
-        () => new Exercise('ex-1', 'plan-1', 'Test', null, null, 3, 10, 60, 0),
-      ).toThrow('Exercise order must be greater than 0');
+      expect(() => new Exercise('ex-1', 'plan-1', 'Test', null, null, 3, 10, 60, 0)).toThrow(
+        'Exercise order must be greater than 0',
+      );
     });
   });
 
@@ -134,9 +134,7 @@ describe('Exercise', () => {
     });
 
     it('should validate values', () => {
-      expect(() => exercise.updateSetsAndReps(0, 10, 60)).toThrow(
-        'Sets must be between 1 and 20',
-      );
+      expect(() => exercise.updateSetsAndReps(0, 10, 60)).toThrow('Sets must be between 1 and 20');
     });
   });
 
@@ -148,9 +146,7 @@ describe('Exercise', () => {
     });
 
     it('should validate order', () => {
-      expect(() => exercise.updateOrder(0)).toThrow(
-        'Exercise order must be greater than 0',
-      );
+      expect(() => exercise.updateOrder(0)).toThrow('Exercise order must be greater than 0');
     });
   });
 
@@ -176,23 +172,11 @@ describe('Exercise', () => {
     it('should format description with all information', () => {
       const formatted = exercise.getFormattedDescription();
 
-      expect(formatted).toBe(
-        '3 séries x 10 repetições | Descanso: 1min | Peito',
-      );
+      expect(formatted).toBe('3 séries x 10 repetições | Descanso: 1min | Peito');
     });
 
     it('should format description without muscle group', () => {
-      exercise = new Exercise(
-        'exercise-1',
-        'plan-1',
-        'Push-up',
-        null,
-        null,
-        2,
-        15,
-        45,
-        1,
-      );
+      exercise = new Exercise('exercise-1', 'plan-1', 'Push-up', null, null, 2, 15, 45, 1);
 
       const formatted = exercise.getFormattedDescription();
 

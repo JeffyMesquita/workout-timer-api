@@ -1,10 +1,6 @@
-import { WorkoutSet } from './set.entity';
+import type { WorkoutSet } from './set.entity';
 
-export type ExecutionStatus =
-  | 'NOT_STARTED'
-  | 'IN_PROGRESS'
-  | 'COMPLETED'
-  | 'SKIPPED';
+export type ExecutionStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'SKIPPED';
 
 export class ExerciseExecution {
   constructor(
@@ -38,9 +34,7 @@ export class ExerciseExecution {
    */
   complete(notes?: string): void {
     if (this.status !== 'IN_PROGRESS') {
-      throw new Error(
-        'Can only complete an exercise execution that is in progress',
-      );
+      throw new Error('Can only complete an exercise execution that is in progress');
     }
 
     this.status = 'COMPLETED';
@@ -72,9 +66,7 @@ export class ExerciseExecution {
     }
 
     if (this.status === 'COMPLETED' || this.status === 'SKIPPED') {
-      throw new Error(
-        'Cannot add sets to a completed or skipped exercise execution',
-      );
+      throw new Error('Cannot add sets to a completed or skipped exercise execution');
     }
 
     // Verificar se já existe série com o mesmo número
@@ -89,12 +81,7 @@ export class ExerciseExecution {
   /**
    * Atualiza uma série específica
    */
-  updateSet(
-    setNumber: number,
-    actualReps: number,
-    weight?: number,
-    notes?: string,
-  ): void {
+  updateSet(setNumber: number, actualReps: number, weight?: number, notes?: string): void {
     const set = this.sets.find((s) => s.setNumber === setNumber);
     if (!set) {
       throw new Error(`Set number ${setNumber} not found`);
@@ -158,9 +145,7 @@ export class ExerciseExecution {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
 
-    return `${minutes.toString().padStart(2, '0')}:${seconds
-      .toString()
-      .padStart(2, '0')}`;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
 
   /**
@@ -177,16 +162,12 @@ export class ExerciseExecution {
   } {
     const completedSets = this.getCompletedSetsCount();
     const totalSets = this.sets.length;
-    const completionRate =
-      totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0;
+    const completionRate = totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0;
 
-    const setsWithWeight = this.sets.filter(
-      (set) => set.weight !== null && set.isCompleted(),
-    );
+    const setsWithWeight = this.sets.filter((set) => set.weight !== null && set.isCompleted());
     const averageWeight =
       setsWithWeight.length > 0
-        ? setsWithWeight.reduce((sum, set) => sum + (set.weight || 0), 0) /
-          setsWithWeight.length
+        ? setsWithWeight.reduce((sum, set) => sum + (set.weight || 0), 0) / setsWithWeight.length
         : null;
 
     const totalReps = this.sets

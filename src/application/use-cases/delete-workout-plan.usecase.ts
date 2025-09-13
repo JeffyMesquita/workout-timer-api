@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+
 import { WorkoutPlanRepository } from '../../domain/repositories/workout-plan.repository';
 
 export interface DeleteWorkoutPlanInput {
@@ -20,19 +21,14 @@ export class DeleteWorkoutPlanUseCase {
     private readonly workoutPlanRepository: WorkoutPlanRepository,
   ) {}
 
-  async execute(
-    input: DeleteWorkoutPlanInput,
-  ): Promise<DeleteWorkoutPlanOutput> {
+  async execute(input: DeleteWorkoutPlanInput): Promise<DeleteWorkoutPlanOutput> {
     const { userId, planId, force = false } = input;
 
     // Validar entrada
     this.validateInput(input);
 
     // Buscar o plano de treino
-    const workoutPlan = await this.workoutPlanRepository.findByIdAndUserId(
-      planId,
-      userId,
-    );
+    const workoutPlan = await this.workoutPlanRepository.findByIdAndUserId(planId, userId);
 
     if (!workoutPlan) {
       throw new Error('Plano de treino não encontrado');

@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
+
 import { WorkoutPlanRepository } from '../../domain/repositories/workout-plan.repository';
 import { WorkoutLimitService } from '../../domain/services/workout-limit.service';
+
 import { CheckPremiumStatusUseCase } from './check-premium-status.usecase';
 
 export interface GetWorkoutPlanByIdInput {
@@ -49,19 +51,14 @@ export class GetWorkoutPlanByIdUseCase {
     private readonly checkPremiumStatus: CheckPremiumStatusUseCase,
   ) {}
 
-  async execute(
-    input: GetWorkoutPlanByIdInput,
-  ): Promise<GetWorkoutPlanByIdOutput> {
+  async execute(input: GetWorkoutPlanByIdInput): Promise<GetWorkoutPlanByIdOutput> {
     const { userId, planId } = input;
 
     // Validar entrada
     this.validateInput(input);
 
     // Buscar o plano de treino
-    const workoutPlan = await this.workoutPlanRepository.findByIdAndUserId(
-      planId,
-      userId,
-    );
+    const workoutPlan = await this.workoutPlanRepository.findByIdAndUserId(planId, userId);
 
     if (!workoutPlan) {
       throw new Error('Plano de treino não encontrado');
@@ -107,9 +104,7 @@ export class GetWorkoutPlanByIdUseCase {
       exercises: exerciseDetails,
       estimatedTotalDurationMinutes: Math.ceil(totalDurationSeconds / 60),
       limitsInfo: {
-        canAddMoreExercises: limits.canAddExercise(
-          workoutPlan.exercises.length,
-        ),
+        canAddMoreExercises: limits.canAddExercise(workoutPlan.exercises.length),
         exerciseLimit: limits.maxExercisesPerPlan,
         currentExerciseCount: workoutPlan.exercises.length,
         isPremium,

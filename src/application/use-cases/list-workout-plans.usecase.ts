@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
+
 import { WorkoutPlanRepository } from '../../domain/repositories/workout-plan.repository';
 import { WorkoutLimitService } from '../../domain/services/workout-limit.service';
+
 import { CheckPremiumStatusUseCase } from './check-premium-status.usecase';
 
 export interface ListWorkoutPlansInput {
@@ -49,13 +51,7 @@ export class ListWorkoutPlansUseCase {
   ) {}
 
   async execute(input: ListWorkoutPlansInput): Promise<ListWorkoutPlansOutput> {
-    const {
-      userId,
-      page = 1,
-      limit = 10,
-      search,
-      includeInactive = false,
-    } = input;
+    const { userId, page = 1, limit = 10, search, includeInactive = false } = input;
 
     // Validar entrada
     this.validateInput(input);
@@ -69,21 +65,17 @@ export class ListWorkoutPlansUseCase {
 
     if (search && search.trim().length > 0) {
       // Busca por nome
-      const searchResults = await this.workoutPlanRepository.searchByName(
-        userId,
-        search.trim(),
-      );
+      const searchResults = await this.workoutPlanRepository.searchByName(userId, search.trim());
       plans = searchResults;
       total = searchResults.length;
     } else {
       // Busca paginada
-      const paginationResult =
-        await this.workoutPlanRepository.findByUserIdWithPagination(
-          userId,
-          page,
-          limit,
-          includeInactive,
-        );
+      const paginationResult = await this.workoutPlanRepository.findByUserIdWithPagination(
+        userId,
+        page,
+        limit,
+        includeInactive,
+      );
       plans = paginationResult.plans;
       total = paginationResult.total;
     }
@@ -102,8 +94,7 @@ export class ListWorkoutPlansUseCase {
 
     // Obter informações de limite
     const limits = this.workoutLimitService.getLimitsForUser(isPremium);
-    const currentActiveCount =
-      await this.workoutPlanRepository.countActiveByUserId(userId);
+    const currentActiveCount = await this.workoutPlanRepository.countActiveByUserId(userId);
 
     return {
       plans: planSummaries,

@@ -1,12 +1,11 @@
-import { CreateWorkoutPlanUseCase } from '../create-workout-plan.usecase';
-import { WorkoutPlanRepository } from '../../../domain/repositories/workout-plan.repository';
-import {
-  WorkoutLimitService,
-  WorkoutLimitExceededException,
-} from '../../../domain/services/workout-limit.service';
-import { CheckPremiumStatusUseCase } from '../check-premium-status.usecase';
 import { WorkoutPlan } from '../../../domain/entities/workout-plan.entity';
+import { WorkoutLimitExceededException } from '../../../domain/services/workout-limit.service';
 import { WorkoutLimits } from '../../../domain/value-objects/workout-limits.vo';
+import { CreateWorkoutPlanUseCase } from '../create-workout-plan.usecase';
+
+import type { WorkoutPlanRepository } from '../../../domain/repositories/workout-plan.repository';
+import type { WorkoutLimitService } from '../../../domain/services/workout-limit.service';
+import type { CheckPremiumStatusUseCase } from '../check-premium-status.usecase';
 
 describe('CreateWorkoutPlanUseCase', () => {
   let useCase: CreateWorkoutPlanUseCase;
@@ -64,9 +63,7 @@ describe('CreateWorkoutPlanUseCase', () => {
       limit: 2,
     });
 
-    mockWorkoutLimitService.getLimitsForUser.mockReturnValue(
-      WorkoutLimits.createFreeTierLimits(),
-    );
+    mockWorkoutLimitService.getLimitsForUser.mockReturnValue(WorkoutLimits.createFreeTierLimits());
 
     mockWorkoutPlanRepository.save.mockImplementation(async (plan) => plan);
   });
@@ -93,9 +90,7 @@ describe('CreateWorkoutPlanUseCase', () => {
         },
       });
 
-      expect(mockWorkoutPlanRepository.save).toHaveBeenCalledWith(
-        expect.any(WorkoutPlan),
-      );
+      expect(mockWorkoutPlanRepository.save).toHaveBeenCalledWith(expect.any(WorkoutPlan));
     });
 
     it('should create workout plan successfully for premium user', async () => {
@@ -105,9 +100,7 @@ describe('CreateWorkoutPlanUseCase', () => {
         expiryDate: new Date(),
       });
 
-      mockWorkoutLimitService.getLimitsForUser.mockReturnValue(
-        WorkoutLimits.createPremiumLimits(),
-      );
+      mockWorkoutLimitService.getLimitsForUser.mockReturnValue(WorkoutLimits.createPremiumLimits());
 
       const result = await useCase.execute(validInput);
 
@@ -123,9 +116,7 @@ describe('CreateWorkoutPlanUseCase', () => {
         limit: 2,
       });
 
-      await expect(useCase.execute(validInput)).rejects.toThrow(
-        WorkoutLimitExceededException,
-      );
+      await expect(useCase.execute(validInput)).rejects.toThrow(WorkoutLimitExceededException);
     });
 
     it('should throw error when name already exists', async () => {
@@ -147,17 +138,16 @@ describe('CreateWorkoutPlanUseCase', () => {
     it('should validate limits correctly', async () => {
       await useCase.execute(validInput);
 
-      expect(
-        mockWorkoutLimitService.validateCanCreateWorkoutPlan,
-      ).toHaveBeenCalledWith(0, false);
+      expect(mockWorkoutLimitService.validateCanCreateWorkoutPlan).toHaveBeenCalledWith(0, false);
     });
 
     it('should check for existing name correctly', async () => {
       await useCase.execute(validInput);
 
-      expect(
-        mockWorkoutPlanRepository.existsByUserIdAndName,
-      ).toHaveBeenCalledWith('user-1', 'Treino A');
+      expect(mockWorkoutPlanRepository.existsByUserIdAndName).toHaveBeenCalledWith(
+        'user-1',
+        'Treino A',
+      );
     });
 
     it('should save workout plan with correct properties', async () => {
@@ -182,9 +172,7 @@ describe('CreateWorkoutPlanUseCase', () => {
         name: 'Treino A',
       };
 
-      await expect(useCase.execute(invalidInput)).rejects.toThrow(
-        'User ID é obrigatório',
-      );
+      await expect(useCase.execute(invalidInput)).rejects.toThrow('User ID é obrigatório');
     });
 
     it('should throw error for empty name', async () => {
@@ -277,9 +265,7 @@ describe('CreateWorkoutPlanUseCase', () => {
 
   describe('edge cases', () => {
     it('should handle repository errors gracefully', async () => {
-      mockWorkoutPlanRepository.save.mockRejectedValue(
-        new Error('Database error'),
-      );
+      mockWorkoutPlanRepository.save.mockRejectedValue(new Error('Database error'));
 
       await expect(
         useCase.execute({
@@ -290,9 +276,7 @@ describe('CreateWorkoutPlanUseCase', () => {
     });
 
     it('should handle premium status check errors', async () => {
-      mockCheckPremiumStatus.execute.mockRejectedValue(
-        new Error('Premium check failed'),
-      );
+      mockCheckPremiumStatus.execute.mockRejectedValue(new Error('Premium check failed'));
 
       await expect(
         useCase.execute({

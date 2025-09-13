@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
-import { SetRepository } from '../../../domain/repositories/set.repository';
+
 import { WorkoutSet } from '../../../domain/entities/set.entity';
+import { SetRepository } from '../../../domain/repositories/set.repository';
+import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class PrismaSetRepository implements SetRepository {
@@ -86,9 +87,7 @@ export class PrismaSetRepository implements SetRepository {
     });
   }
 
-  async countCompletedByExerciseExecutionId(
-    exerciseExecutionId: string,
-  ): Promise<number> {
+  async countCompletedByExerciseExecutionId(exerciseExecutionId: string): Promise<number> {
     return this.prisma.set.count({
       where: {
         exerciseExecutionId,
@@ -223,9 +222,7 @@ export class PrismaSetRepository implements SetRepository {
       totalSets,
       completedSets,
       averageReps: Math.round(stats._avg.actualReps || 0),
-      averageWeight: stats._avg.weight
-        ? Math.round(stats._avg.weight * 100) / 100
-        : null,
+      averageWeight: stats._avg.weight ? Math.round(stats._avg.weight * 100) / 100 : null,
       maxWeight: stats._max.weight,
       totalVolume,
       progressionData,
@@ -312,9 +309,7 @@ export class PrismaSetRepository implements SetRepository {
     return savedSets;
   }
 
-  async deleteByExerciseExecutionId(
-    exerciseExecutionId: string,
-  ): Promise<void> {
+  async deleteByExerciseExecutionId(exerciseExecutionId: string): Promise<void> {
     await this.prisma.set.deleteMany({
       where: { exerciseExecutionId },
     });

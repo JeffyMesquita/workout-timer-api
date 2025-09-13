@@ -1,8 +1,4 @@
-import {
-  WorkoutLimitServiceImpl,
-  WorkoutLimitExceededException,
-} from '../workout-limit.service';
-import { WorkoutLimits } from '../../value-objects/workout-limits.vo';
+import { WorkoutLimitServiceImpl, WorkoutLimitExceededException } from '../workout-limit.service';
 
 describe('WorkoutLimitServiceImpl', () => {
   let service: WorkoutLimitServiceImpl;
@@ -46,9 +42,7 @@ describe('WorkoutLimitServiceImpl', () => {
       expect(result.isValid).toBe(false);
       expect(result.current).toBe(2);
       expect(result.limit).toBe(2);
-      expect(result.message).toContain(
-        'Você atingiu o limite de 2 planos de treino',
-      );
+      expect(result.message).toContain('Você atingiu o limite de 2 planos de treino');
       expect(result.message).toContain('upgrade para Premium');
     });
 
@@ -76,9 +70,7 @@ describe('WorkoutLimitServiceImpl', () => {
       expect(result.isValid).toBe(false);
       expect(result.current).toBe(5);
       expect(result.limit).toBe(5);
-      expect(result.message).toContain(
-        'Você atingiu o limite de 5 exercícios por plano',
-      );
+      expect(result.message).toContain('Você atingiu o limite de 5 exercícios por plano');
       expect(result.message).toContain('upgrade para Premium');
     });
 
@@ -166,10 +158,7 @@ describe('WorkoutLimitExceededException', () => {
       message: 'Default message',
     };
 
-    const exception = new WorkoutLimitExceededException(
-      validationResult,
-      'Custom message',
-    );
+    const exception = new WorkoutLimitExceededException(validationResult, 'Custom message');
 
     expect(exception.message).toBe('Custom message');
     expect(exception.validationResult).toBe(validationResult);

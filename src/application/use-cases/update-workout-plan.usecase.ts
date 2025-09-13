@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+
 import { WorkoutPlanRepository } from '../../domain/repositories/workout-plan.repository';
 
 export interface UpdateWorkoutPlanInput {
@@ -25,19 +26,14 @@ export class UpdateWorkoutPlanUseCase {
     private readonly workoutPlanRepository: WorkoutPlanRepository,
   ) {}
 
-  async execute(
-    input: UpdateWorkoutPlanInput,
-  ): Promise<UpdateWorkoutPlanOutput> {
+  async execute(input: UpdateWorkoutPlanInput): Promise<UpdateWorkoutPlanOutput> {
     const { userId, planId, name, description, isActive } = input;
 
     // Validar entrada
     this.validateInput(input);
 
     // Buscar o plano de treino
-    const workoutPlan = await this.workoutPlanRepository.findByIdAndUserId(
-      planId,
-      userId,
-    );
+    const workoutPlan = await this.workoutPlanRepository.findByIdAndUserId(planId, userId);
 
     if (!workoutPlan) {
       throw new Error('Plano de treino não encontrado');
@@ -104,9 +100,7 @@ export class UpdateWorkoutPlanUseCase {
       input.description === undefined &&
       input.isActive === undefined
     ) {
-      throw new Error(
-        'Pelo menos um campo deve ser fornecido para atualização',
-      );
+      throw new Error('Pelo menos um campo deve ser fornecido para atualização');
     }
 
     // Validar nome se fornecido

@@ -1,4 +1,4 @@
-import { WorkoutSet } from '../entities/set.entity';
+import type { WorkoutSet } from '../entities/set.entity';
 
 export interface SetRepository {
   /**
@@ -32,9 +32,7 @@ export interface SetRepository {
   /**
    * Conta séries completadas de uma execução
    */
-  countCompletedByExerciseExecutionId(
-    exerciseExecutionId: string,
-  ): Promise<number>;
+  countCompletedByExerciseExecutionId(exerciseExecutionId: string): Promise<number>;
 
   /**
    * Busca séries por peso (para comparação)

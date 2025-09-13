@@ -1,4 +1,4 @@
-import { WorkoutSession } from '../entities/workout-session.entity';
+import type { WorkoutSession } from '../entities/workout-session.entity';
 
 export interface WorkoutSessionRepository {
   /**
@@ -65,18 +65,12 @@ export interface WorkoutSessionRepository {
   /**
    * Busca última sessão de um plano específico
    */
-  findLastByWorkoutPlanId(
-    workoutPlanId: string,
-  ): Promise<WorkoutSession | null>;
+  findLastByWorkoutPlanId(workoutPlanId: string): Promise<WorkoutSession | null>;
 
   /**
    * Busca sessões dentro de um período
    */
-  findByDateRange(
-    userId: string,
-    startDate: Date,
-    endDate: Date,
-  ): Promise<WorkoutSession[]>;
+  findByDateRange(userId: string, startDate: Date, endDate: Date): Promise<WorkoutSession[]>;
 
   /**
    * Estatísticas de sessões

@@ -1,0 +1,241 @@
+name: 🔒 Security Checks
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+  schedule:
+    - cron: '0 2 * * *' # Daily at 2 AM UTC
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10.0.0'
+
+jobs:
+  # Job 1: Dependency Security Audit
+  dependency-audit:
+    name: 🔍 Dependency Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔒 Security audit
+        run: |
+          pnpm audit --audit-level moderate --json > audit-report.json || true
+
+          # Check for high/critical vulnerabilities
+          HIGH_VULNS=$(cat audit-report.json | jq '.metadata.vulnerabilities.high // 0')
+          CRITICAL_VULNS=$(cat audit-report.json | jq '.metadata.vulnerabilities.critical // 0')
+
+          echo "High vulnerabilities: $HIGH_VULNS"
+          echo "Critical vulnerabilities: $CRITICAL_VULNS"
+
+          if [ "$CRITICAL_VULNS" -gt 0 ]; then
+            echo "❌ Critical vulnerabilities found!"
+            exit 1
+          fi
+
+          if [ "$HIGH_VULNS" -gt 5 ]; then
+            echo "⚠️ Too many high vulnerabilities found!"
+            exit 1
+          fi
+
+      - name: 📊 Security summary
+        if: always()
+        run: |
+          echo "## 🔒 Security Audit Summary" >> $GITHUB_STEP_SUMMARY
+          echo "$(cat audit-report.json | jq -r '.metadata.vulnerabilities')" >> $GITHUB_STEP_SUMMARY
+
+      - name: 📤 Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit-report
+          path: audit-report.json
+
+  # Job 2: Secret Scanning
+  secret-scan:
+    name: 🕵️ Secret Scanning
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🕵️ Run TruffleHog secret scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  # Job 3: Code Security Analysis
+  code-security:
+    name: 🛡️ Code Security Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      security-events: write
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🛡️ Run Semgrep security analysis
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/secrets
+            p/owasp-top-ten
+            p/typescript
+          generateSarif: '1'
+
+      - name: 📤 Upload SARIF file
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+
+  # Job 4: Docker Security Scan
+  docker-security:
+    name: 🐳 Docker Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🏗️ Build Docker image for scanning
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          load: true
+          tags: workout-timer-api:security-scan
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 🔍 Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'workout-timer-api:security-scan'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: 📤 Upload Trivy scan results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: 🔍 Dockerfile security scan
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+          format: sarif
+          output-file: hadolint-results.sarif
+
+      - name: 📤 Upload Hadolint results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: hadolint-results.sarif
+
+  # Job 5: License Compliance
+  license-check:
+    name: 📄 License Compliance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 📄 Check licenses
+        run: |
+          npx license-checker --onlyAllow "MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC" --excludePrivatePackages
+
+      - name: 📊 Generate license report
+        run: |
+          npx license-checker --json > license-report.json
+          echo "## 📄 License Summary" >> $GITHUB_STEP_SUMMARY
+          echo "$(npx license-checker --summary)" >> $GITHUB_STEP_SUMMARY
+
+      - name: 📤 Upload license report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: license-report
+          path: license-report.json
+
+  # Job 6: Security Summary
+  security-summary:
+    name: 📋 Security Summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [dependency-audit, secret-scan, code-security, docker-security, license-check]
+    if: always()
+
+    steps:
+      - name: 📋 Generate security summary
+        run: |
+          echo "## 🔒 Security Analysis Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Audit | ${{ needs.dependency-audit.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Secret Scanning | ${{ needs.secret-scan.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Code Security | ${{ needs.code-security.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Security | ${{ needs.docker-security.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| License Check | ${{ needs.license-check.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Overall security status
+          if [ "${{ needs.dependency-audit.result }}" == "success" ] && 
+             [ "${{ needs.secret-scan.result }}" == "success" ] && 
+             [ "${{ needs.code-security.result }}" == "success" ] && 
+             [ "${{ needs.docker-security.result }}" == "success" ] && 
+             [ "${{ needs.license-check.result }}" == "success" ]; then
+            echo "🎉 **All security checks passed!**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Some security checks failed - review required**" >> $GITHUB_STEP_SUMMARY
+          fi

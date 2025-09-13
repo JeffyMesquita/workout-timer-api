@@ -1,0 +1,32 @@
+# Code Owners for Workout Timer API
+
+# Global owners
+* @your-username
+
+# Domain layer (critical business logic)
+src/domain/ @your-username @senior-dev
+
+# Infrastructure layer (database, external services)
+src/infrastructure/ @your-username @devops-team
+
+# Security sensitive files
+src/infrastructure/auth/ @your-username @security-team
+*.yml @your-username @devops-team
+*.yaml @your-username @devops-team
+Dockerfile @your-username @devops-team
+docker-compose*.yml @your-username @devops-team
+
+# CI/CD workflows
+.github/workflows/ @your-username @devops-team
+
+# Documentation
+*.md @your-username @docs-team
+
+# Configuration files
+eslint.config.mjs @your-username
+.prettierrc @your-username
+jest.config.js @your-username
+tsconfig*.json @your-username
+
+# Database schema
+prisma/schema.prisma @your-username @database-team

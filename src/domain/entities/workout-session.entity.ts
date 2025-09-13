@@ -1,8 +1,4 @@
-export type WorkoutSessionStatus =
-  | 'IN_PROGRESS'
-  | 'PAUSED'
-  | 'COMPLETED'
-  | 'CANCELLED';
+export type WorkoutSessionStatus = 'IN_PROGRESS' | 'PAUSED' | 'COMPLETED' | 'CANCELLED';
 
 export class WorkoutSession {
   constructor(
@@ -52,9 +48,7 @@ export class WorkoutSession {
    */
   complete(notes?: string): void {
     if (this.status !== 'IN_PROGRESS' && this.status !== 'PAUSED') {
-      throw new Error(
-        'Can only complete a workout session that is in progress or paused',
-      );
+      throw new Error('Can only complete a workout session that is in progress or paused');
     }
 
     this.status = 'COMPLETED';
@@ -69,9 +63,7 @@ export class WorkoutSession {
    */
   cancel(reason?: string): void {
     if (this.status === 'COMPLETED' || this.status === 'CANCELLED') {
-      throw new Error(
-        'Cannot cancel a workout session that is already completed or cancelled',
-      );
+      throw new Error('Cannot cancel a workout session that is already completed or cancelled');
     }
 
     this.status = 'CANCELLED';
@@ -113,8 +105,7 @@ export class WorkoutSession {
     if (this.pausedAt && this.resumedAt) {
       // Se houve pausa e retomada, calcular considerando o tempo pausado
       const pauseDuration = this.resumedAt.getTime() - this.pausedAt.getTime();
-      totalDuration =
-        endTime.getTime() - this.startedAt.getTime() - pauseDuration;
+      totalDuration = endTime.getTime() - this.startedAt.getTime() - pauseDuration;
     } else if (this.pausedAt && !this.resumedAt) {
       // Se está pausado e não foi retomado, calcular até o momento da pausa
       totalDuration = this.pausedAt.getTime() - this.startedAt.getTime();
@@ -158,9 +149,7 @@ export class WorkoutSession {
         .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 
-    return `${minutes.toString().padStart(2, '0')}:${seconds
-      .toString()
-      .padStart(2, '0')}`;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
 
   /**

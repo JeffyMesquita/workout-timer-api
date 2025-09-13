@@ -1,8 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { PrismaService } from '../infrastructure/database/prisma.service';
-import { GoogleIdTokenVerifier } from '../infrastructure/auth/google.strategy';
+
 import { AppleIdTokenVerifier } from '../infrastructure/auth/apple.strategy';
+import { GoogleIdTokenVerifier } from '../infrastructure/auth/google.strategy';
 import { JwtServiceLocal } from '../infrastructure/auth/jwt.service';
+import { PrismaService } from '../infrastructure/database/prisma.service';
 
 @Controller('auth')
 export class AuthController {

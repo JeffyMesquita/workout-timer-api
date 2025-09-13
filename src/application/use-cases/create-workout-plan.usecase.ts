@@ -1,10 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
+
 import { WorkoutPlan } from '../../domain/entities/workout-plan.entity';
 import { WorkoutPlanRepository } from '../../domain/repositories/workout-plan.repository';
 import {
   WorkoutLimitService,
   WorkoutLimitExceededException,
 } from '../../domain/services/workout-limit.service';
+
 import { CheckPremiumStatusUseCase } from './check-premium-status.usecase';
 
 export interface CreateWorkoutPlanInput {
@@ -37,9 +39,7 @@ export class CreateWorkoutPlanUseCase {
     private readonly checkPremiumStatus: CheckPremiumStatusUseCase,
   ) {}
 
-  async execute(
-    input: CreateWorkoutPlanInput,
-  ): Promise<CreateWorkoutPlanOutput> {
+  async execute(input: CreateWorkoutPlanInput): Promise<CreateWorkoutPlanOutput> {
     const { userId, name, description } = input;
 
     // Validar entrada
@@ -50,25 +50,20 @@ export class CreateWorkoutPlanUseCase {
     const isPremium = premiumStatus.isPremium;
 
     // Contar planos existentes
-    const currentPlansCount =
-      await this.workoutPlanRepository.countActiveByUserId(userId);
+    const currentPlansCount = await this.workoutPlanRepository.countActiveByUserId(userId);
 
     // Validar limites
-    const limitValidation =
-      await this.workoutLimitService.validateCanCreateWorkoutPlan(
-        currentPlansCount,
-        isPremium,
-      );
+    const limitValidation = await this.workoutLimitService.validateCanCreateWorkoutPlan(
+      currentPlansCount,
+      isPremium,
+    );
 
     if (!limitValidation.isValid) {
       throw new WorkoutLimitExceededException(limitValidation);
     }
 
     // Verificar se já existe um plano com o mesmo nome
-    const nameExists = await this.workoutPlanRepository.existsByUserIdAndName(
-      userId,
-      name,
-    );
+    const nameExists = await this.workoutPlanRepository.existsByUserIdAndName(userId, name);
     if (nameExists) {
       throw new Error(`Já existe um plano de treino com o nome "${name}"`);
     }
@@ -117,9 +112,7 @@ export class CreateWorkoutPlanUseCase {
     }
 
     if (input.name.trim().length > 100) {
-      throw new Error(
-        'Nome do plano de treino deve ter no máximo 100 caracteres',
-      );
+      throw new Error('Nome do plano de treino deve ter no máximo 100 caracteres');
     }
 
     if (input.description && input.description.length > 500) {

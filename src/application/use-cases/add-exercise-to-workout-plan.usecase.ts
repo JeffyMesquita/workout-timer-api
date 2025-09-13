@@ -1,12 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { WorkoutPlanRepository } from '../../domain/repositories/workout-plan.repository';
+
+import { Exercise } from '../../domain/entities/exercise.entity';
 import { ExerciseRepository } from '../../domain/repositories/exercise.repository';
+import { WorkoutPlanRepository } from '../../domain/repositories/workout-plan.repository';
 import {
   WorkoutLimitService,
   WorkoutLimitExceededException,
 } from '../../domain/services/workout-limit.service';
+
 import { CheckPremiumStatusUseCase } from './check-premium-status.usecase';
-import { Exercise } from '../../domain/entities/exercise.entity';
 
 export interface AddExerciseToWorkoutPlanInput {
   userId: string;
@@ -50,9 +52,7 @@ export class AddExerciseToWorkoutPlanUseCase {
     private readonly checkPremiumStatus: CheckPremiumStatusUseCase,
   ) {}
 
-  async execute(
-    input: AddExerciseToWorkoutPlanInput,
-  ): Promise<AddExerciseToWorkoutPlanOutput> {
+  async execute(input: AddExerciseToWorkoutPlanInput): Promise<AddExerciseToWorkoutPlanOutput> {
     const {
       userId,
       workoutPlanId,
@@ -68,10 +68,7 @@ export class AddExerciseToWorkoutPlanUseCase {
     this.validateInput(input);
 
     // Verificar se o plano de treino existe e pertence ao usuário
-    const workoutPlan = await this.workoutPlanRepository.findByIdAndUserId(
-      workoutPlanId,
-      userId,
-    );
+    const workoutPlan = await this.workoutPlanRepository.findByIdAndUserId(workoutPlanId, userId);
 
     if (!workoutPlan) {
       throw new Error('Plano de treino não encontrado');
@@ -86,37 +83,30 @@ export class AddExerciseToWorkoutPlanUseCase {
     const isPremium = premiumStatus.isPremium;
 
     // Contar exercícios existentes no plano
-    const currentExerciseCount =
-      await this.exerciseRepository.countByWorkoutPlanId(workoutPlanId);
+    const currentExerciseCount = await this.exerciseRepository.countByWorkoutPlanId(workoutPlanId);
 
     // Validar limites
-    const limitValidation =
-      await this.workoutLimitService.validateCanAddExercise(
-        currentExerciseCount,
-        isPremium,
-      );
+    const limitValidation = await this.workoutLimitService.validateCanAddExercise(
+      currentExerciseCount,
+      isPremium,
+    );
 
     if (!limitValidation.isValid) {
       throw new WorkoutLimitExceededException(limitValidation);
     }
 
     // Verificar se já existe exercício com o mesmo nome no plano
-    const nameExists =
-      await this.exerciseRepository.existsByWorkoutPlanIdAndName(
-        workoutPlanId,
-        name.trim(),
-      );
+    const nameExists = await this.exerciseRepository.existsByWorkoutPlanIdAndName(
+      workoutPlanId,
+      name.trim(),
+    );
 
     if (nameExists) {
-      throw new Error(
-        `Já existe um exercício com o nome "${name}" neste plano de treino`,
-      );
+      throw new Error(`Já existe um exercício com o nome "${name}" neste plano de treino`);
     }
 
     // Obter próximo número de ordem
-    const nextOrder = await this.exerciseRepository.getNextOrderByWorkoutPlanId(
-      workoutPlanId,
-    );
+    const nextOrder = await this.exerciseRepository.getNextOrderByWorkoutPlanId(workoutPlanId);
 
     // Criar o exercício
     const exercise = new Exercise(
@@ -137,9 +127,7 @@ export class AddExerciseToWorkoutPlanUseCase {
     const savedExercise = await this.exerciseRepository.save(exercise);
 
     // Obter informações atualizadas do plano
-    const updatedPlan = await this.workoutPlanRepository.findById(
-      workoutPlanId,
-    );
+    const updatedPlan = await this.workoutPlanRepository.findById(workoutPlanId);
     const newExerciseCount = currentExerciseCount + 1;
     const limits = this.workoutLimitService.getLimitsForUser(isPremium);
 

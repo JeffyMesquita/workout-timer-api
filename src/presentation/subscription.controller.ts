@@ -1,7 +1,8 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+
 import { ActivateSubscriptionUseCase } from '../application/use-cases/activate-subscription.usecase';
-import { RestoreSubscriptionUseCase } from '../application/use-cases/restore-subscription.usecase';
 import { CheckPremiumStatusUseCase } from '../application/use-cases/check-premium-status.usecase';
+import { RestoreSubscriptionUseCase } from '../application/use-cases/restore-subscription.usecase';
 import { JwtAuthGuard } from '../infrastructure/auth/jwt.guard';
 
 @Controller('subscriptions')
@@ -14,7 +15,10 @@ export class SubscriptionController {
   ) {}
 
   @Post('activate')
-  async activateEndpoint(@Req() req: any, @Body() body: { productId: string; purchaseToken: string }) {
+  async activateEndpoint(
+    @Req() req: any,
+    @Body() body: { productId: string; purchaseToken: string },
+  ) {
     const userId = req.user.id;
     return this.activate.execute({ userId, ...body });
   }

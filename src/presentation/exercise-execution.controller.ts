@@ -11,11 +11,7 @@ import {
   HttpStatus,
   HttpException,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../infrastructure/auth/jwt.guard';
-import {
-  StartExerciseExecutionUseCase,
-  StartExerciseExecutionInput,
-} from '../application/use-cases/start-exercise-execution.usecase';
+
 import {
   CompleteSetUseCase,
   CompleteSetInput,
@@ -24,6 +20,11 @@ import {
   FinishExerciseExecutionUseCase,
   FinishExerciseExecutionInput,
 } from '../application/use-cases/finish-exercise-execution.usecase';
+import {
+  StartExerciseExecutionUseCase,
+  StartExerciseExecutionInput,
+} from '../application/use-cases/start-exercise-execution.usecase';
+import { JwtAuthGuard } from '../infrastructure/auth/jwt.guard';
 
 // DTOs
 export class StartExerciseExecutionDto {
@@ -78,10 +79,7 @@ export class ExerciseExecutionController {
     } catch (error) {
       const errorMessage = this.getErrorMessage(error);
 
-      if (
-        errorMessage.includes('não encontrada') ||
-        errorMessage.includes('não encontrado')
-      ) {
+      if (errorMessage.includes('não encontrada') || errorMessage.includes('não encontrado')) {
         throw new HttpException(
           {
             success: false,
@@ -92,10 +90,7 @@ export class ExerciseExecutionController {
         );
       }
 
-      if (
-        errorMessage.includes('inativa') ||
-        errorMessage.includes('já foi iniciado')
-      ) {
+      if (errorMessage.includes('inativa') || errorMessage.includes('já foi iniciado')) {
         throw new HttpException(
           {
             success: false,
@@ -145,10 +140,7 @@ export class ExerciseExecutionController {
     } catch (error) {
       const errorMessage = this.getErrorMessage(error);
 
-      if (
-        errorMessage.includes('não encontrada') ||
-        errorMessage.includes('não encontrado')
-      ) {
+      if (errorMessage.includes('não encontrada') || errorMessage.includes('não encontrado')) {
         throw new HttpException(
           {
             success: false,
@@ -159,10 +151,7 @@ export class ExerciseExecutionController {
         );
       }
 
-      if (
-        errorMessage.includes('já foi completada') ||
-        errorMessage.includes('inativa')
-      ) {
+      if (errorMessage.includes('já foi completada') || errorMessage.includes('inativa')) {
         throw new HttpException(
           {
             success: false,
@@ -208,10 +197,7 @@ export class ExerciseExecutionController {
     } catch (error) {
       const errorMessage = this.getErrorMessage(error);
 
-      if (
-        errorMessage.includes('não encontrada') ||
-        errorMessage.includes('não encontrado')
-      ) {
+      if (errorMessage.includes('não encontrada') || errorMessage.includes('não encontrado')) {
         throw new HttpException(
           {
             success: false,
@@ -256,10 +242,7 @@ export class ExerciseExecutionController {
   }
 
   @Get(':id')
-  async getExerciseExecution(
-    @Req() req: any,
-    @Param('id') exerciseExecutionId: string,
-  ) {
+  async getExerciseExecution(@Req() req: any, @Param('id') exerciseExecutionId: string) {
     try {
       // TODO: Implementar GetExerciseExecutionByIdUseCase
       return {

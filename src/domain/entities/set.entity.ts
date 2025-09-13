@@ -19,12 +19,7 @@ export class WorkoutSet {
   /**
    * Marca a série como completa com os dados reais
    */
-  complete(
-    actualReps: number,
-    weight?: number,
-    notes?: string,
-    restTimeSeconds?: number,
-  ): void {
+  complete(actualReps: number, weight?: number, notes?: string, restTimeSeconds?: number): void {
     this.validateActualReps(actualReps);
     this.validateWeight(weight);
     this.validateRestTime(restTimeSeconds);
@@ -148,9 +143,7 @@ export class WorkoutSet {
 
     const repsText = `${this.actualReps}/${this.plannedReps} reps`;
     const weightText = this.weight ? ` | ${this.getFormattedWeight()}` : '';
-    const restText = this.restTimeSeconds
-      ? ` | Descanso: ${this.getFormattedRestTime()}`
-      : '';
+    const restText = this.restTimeSeconds ? ` | Descanso: ${this.getFormattedRestTime()}` : '';
 
     return `Série ${this.setNumber}: ${repsText}${weightText}${restText}`;
   }
@@ -163,21 +156,14 @@ export class WorkoutSet {
     weightImprovement: number;
     overallImprovement: 'better' | 'same' | 'worse';
   } {
-    const repsImprovement =
-      (this.actualReps || 0) - (previousSet.actualReps || 0);
+    const repsImprovement = (this.actualReps || 0) - (previousSet.actualReps || 0);
     const weightImprovement = (this.weight || 0) - (previousSet.weight || 0);
 
     let overallImprovement: 'better' | 'same' | 'worse' = 'same';
 
-    if (
-      weightImprovement > 0 ||
-      (weightImprovement === 0 && repsImprovement > 0)
-    ) {
+    if (weightImprovement > 0 || (weightImprovement === 0 && repsImprovement > 0)) {
       overallImprovement = 'better';
-    } else if (
-      weightImprovement < 0 ||
-      (weightImprovement === 0 && repsImprovement < 0)
-    ) {
+    } else if (weightImprovement < 0 || (weightImprovement === 0 && repsImprovement < 0)) {
       overallImprovement = 'worse';
     }
 
@@ -259,10 +245,7 @@ export class WorkoutSet {
     completionPercentage: number;
     volume: number; // peso x reps
   } {
-    const volume =
-      this.isCompleted() && this.weight
-        ? this.weight * (this.actualReps || 0)
-        : 0;
+    const volume = this.isCompleted() && this.weight ? this.weight * (this.actualReps || 0) : 0;
 
     return {
       isCompleted: this.isCompleted(),

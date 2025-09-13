@@ -1,4 +1,4 @@
-import { Exercise } from '../entities/exercise.entity';
+import type { Exercise } from '../entities/exercise.entity';
 
 export interface ExerciseRepository {
   /**
@@ -43,10 +43,7 @@ export interface ExerciseRepository {
   /**
    * Busca exercícios por grupo muscular
    */
-  findByMuscleGroup(
-    workoutPlanId: string,
-    muscleGroup: string,
-  ): Promise<Exercise[]>;
+  findByMuscleGroup(workoutPlanId: string, muscleGroup: string): Promise<Exercise[]>;
 
   /**
    * Obtém o próximo número de ordem para um exercício no plano

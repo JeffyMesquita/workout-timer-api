@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
-import { WorkoutSessionRepository } from '../../../domain/repositories/workout-session.repository';
+
 import { WorkoutSession } from '../../../domain/entities/workout-session.entity';
+import { WorkoutSessionRepository } from '../../../domain/repositories/workout-session.repository';
+import { PrismaService } from '../prisma.service';
 
 @Injectable()
-export class PrismaWorkoutSessionRepository
-  implements WorkoutSessionRepository
-{
+export class PrismaWorkoutSessionRepository implements WorkoutSessionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findById(id: string): Promise<WorkoutSession | null> {
@@ -17,10 +16,7 @@ export class PrismaWorkoutSessionRepository
     return session ? this.toDomainEntity(session) : null;
   }
 
-  async findByIdAndUserId(
-    id: string,
-    userId: string,
-  ): Promise<WorkoutSession | null> {
+  async findByIdAndUserId(id: string, userId: string): Promise<WorkoutSession | null> {
     const session = await this.prisma.workoutSession.findFirst({
       where: {
         id,
@@ -103,10 +99,7 @@ export class PrismaWorkoutSessionRepository
     };
   }
 
-  async countByUserIdAndStatus(
-    userId: string,
-    status: string,
-  ): Promise<number> {
+  async countByUserIdAndStatus(userId: string, status: string): Promise<number> {
     return this.prisma.workoutSession.count({
       where: {
         userId,
@@ -180,9 +173,7 @@ export class PrismaWorkoutSessionRepository
     return count > 0;
   }
 
-  async findLastByWorkoutPlanId(
-    workoutPlanId: string,
-  ): Promise<WorkoutSession | null> {
+  async findLastByWorkoutPlanId(workoutPlanId: string): Promise<WorkoutSession | null> {
     const session = await this.prisma.workoutSession.findFirst({
       where: { workoutPlanId },
       orderBy: { startedAt: 'desc' },
@@ -191,11 +182,7 @@ export class PrismaWorkoutSessionRepository
     return session ? this.toDomainEntity(session) : null;
   }
 
-  async findByDateRange(
-    userId: string,
-    startDate: Date,
-    endDate: Date,
-  ): Promise<WorkoutSession[]> {
+  async findByDateRange(userId: string, startDate: Date, endDate: Date): Promise<WorkoutSession[]> {
     const sessions = await this.prisma.workoutSession.findMany({
       where: {
         userId,
@@ -217,29 +204,28 @@ export class PrismaWorkoutSessionRepository
     averageDurationMinutes: number;
     totalWorkoutTimeMinutes: number;
   }> {
-    const [totalSessions, completedSessions, cancelledSessions, avgDuration] =
-      await Promise.all([
-        this.prisma.workoutSession.count({ where: { userId } }),
-        this.prisma.workoutSession.count({
-          where: { userId, status: 'COMPLETED' },
-        }),
-        this.prisma.workoutSession.count({
-          where: { userId, status: 'CANCELLED' },
-        }),
-        this.prisma.workoutSession.aggregate({
-          where: {
-            userId,
-            status: 'COMPLETED',
-            totalDurationMs: { not: null },
-          },
-          _avg: {
-            totalDurationMs: true,
-          },
-          _sum: {
-            totalDurationMs: true,
-          },
-        }),
-      ]);
+    const [totalSessions, completedSessions, cancelledSessions, avgDuration] = await Promise.all([
+      this.prisma.workoutSession.count({ where: { userId } }),
+      this.prisma.workoutSession.count({
+        where: { userId, status: 'COMPLETED' },
+      }),
+      this.prisma.workoutSession.count({
+        where: { userId, status: 'CANCELLED' },
+      }),
+      this.prisma.workoutSession.aggregate({
+        where: {
+          userId,
+          status: 'COMPLETED',
+          totalDurationMs: { not: null },
+        },
+        _avg: {
+          totalDurationMs: true,
+        },
+        _sum: {
+          totalDurationMs: true,
+        },
+      }),
+    ]);
 
     const averageDurationMinutes = avgDuration._avg.totalDurationMs
       ? Math.round(avgDuration._avg.totalDurationMs / (1000 * 60))

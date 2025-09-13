@@ -1,4 +1,4 @@
-import { Subscription } from '../entities/subscription.entity';
+import type { Subscription } from '../entities/subscription.entity';
 
 export interface SubscriptionRepository {
   findByPurchaseToken(token: string): Promise<Subscription | null>;

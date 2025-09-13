@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+
 import { ExerciseExecutionRepository } from '../../domain/repositories/exercise-execution.repository';
 import { SetRepository } from '../../domain/repositories/set.repository';
 
@@ -53,18 +54,14 @@ export class FinishExerciseExecutionUseCase {
     private readonly setRepository: SetRepository,
   ) {}
 
-  async execute(
-    input: FinishExerciseExecutionInput,
-  ): Promise<FinishExerciseExecutionOutput> {
+  async execute(input: FinishExerciseExecutionInput): Promise<FinishExerciseExecutionOutput> {
     const { userId, exerciseExecutionId, notes, forceComplete = false } = input;
 
     // Validar entrada
     this.validateInput(input);
 
     // Buscar a execução do exercício
-    const exerciseExecution = await this.exerciseExecutionRepository.findById(
-      exerciseExecutionId,
-    );
+    const exerciseExecution = await this.exerciseExecutionRepository.findById(exerciseExecutionId);
 
     if (!exerciseExecution) {
       throw new Error('Execução de exercício não encontrada');
@@ -84,36 +81,26 @@ export class FinishExerciseExecutionUseCase {
     }
 
     // Buscar informações detalhadas das séries
-    const sets = await this.setRepository.findByExerciseExecutionId(
-      exerciseExecutionId,
-    );
+    const sets = await this.setRepository.findByExerciseExecutionId(exerciseExecutionId);
 
     // Finalizar a execução
     exerciseExecution.complete(notes);
 
     // Salvar alterações
-    const savedExecution = await this.exerciseExecutionRepository.save(
-      exerciseExecution,
-    );
+    const savedExecution = await this.exerciseExecutionRepository.save(exerciseExecution);
 
     // Calcular estatísticas de performance
     const completedSets = sets.filter((set) => set.isCompleted());
     const skippedSets = sets.length - completedSets.length;
     const completionRate =
-      sets.length > 0
-        ? Math.round((completedSets.length / sets.length) * 100)
-        : 0;
+      sets.length > 0 ? Math.round((completedSets.length / sets.length) * 100) : 0;
 
-    const totalReps = completedSets.reduce(
-      (sum, set) => sum + (set.actualReps || 0),
-      0,
-    );
+    const totalReps = completedSets.reduce((sum, set) => sum + (set.actualReps || 0), 0);
 
     const setsWithWeight = completedSets.filter((set) => set.weight !== null);
     const averageWeight =
       setsWithWeight.length > 0
-        ? setsWithWeight.reduce((sum, set) => sum + (set.weight || 0), 0) /
-          setsWithWeight.length
+        ? setsWithWeight.reduce((sum, set) => sum + (set.weight || 0), 0) / setsWithWeight.length
         : null;
 
     const totalVolume = completedSets.reduce(
@@ -122,10 +109,7 @@ export class FinishExerciseExecutionUseCase {
     );
 
     // Gerar recomendações
-    const recommendations = this.generateRecommendations(
-      sets,
-      exerciseExecution,
-    );
+    const recommendations = this.generateRecommendations(sets, exerciseExecution);
 
     // Preparar informações das séries
     const setInfos = sets.map((set) => ({
@@ -168,10 +152,7 @@ export class FinishExerciseExecutionUseCase {
       throw new Error('User ID é obrigatório');
     }
 
-    if (
-      !input.exerciseExecutionId ||
-      input.exerciseExecutionId.trim().length === 0
-    ) {
+    if (!input.exerciseExecutionId || input.exerciseExecutionId.trim().length === 0) {
       throw new Error('Exercise Execution ID é obrigatório');
     }
 
@@ -202,18 +183,14 @@ export class FinishExerciseExecutionUseCase {
 
     // Análise de performance geral
     const averageCompletion =
-      completedSets.reduce(
-        (sum, set) => sum + set.getCompletionPercentage(),
-        0,
-      ) / completedSets.length;
+      completedSets.reduce((sum, set) => sum + set.getCompletionPercentage(), 0) /
+      completedSets.length;
 
     if (averageCompletion >= 110) {
       performanceNotes.push('Excelente performance! Superou o planejado');
       nextWorkoutSuggestions.push('Considere aumentar o peso em 5-10%');
     } else if (averageCompletion >= 100) {
-      performanceNotes.push(
-        'Performance perfeita! Atingiu todas as repetições',
-      );
+      performanceNotes.push('Performance perfeita! Atingiu todas as repetições');
       nextWorkoutSuggestions.push('Mantenha o peso ou aumente levemente');
     } else if (averageCompletion >= 80) {
       performanceNotes.push('Boa performance, próximo do objetivo');
@@ -224,29 +201,21 @@ export class FinishExerciseExecutionUseCase {
     }
 
     // Análise de progressão de peso
-    const weights = completedSets
-      .map((set) => set.weight)
-      .filter((weight) => weight !== null);
+    const weights = completedSets.map((set) => set.weight).filter((weight) => weight !== null);
 
     if (weights.length > 1) {
       const weightProgression = weights[weights.length - 1]! - weights[0]!;
       if (weightProgression > 0) {
-        performanceNotes.push(
-          `Progressão de peso: +${weightProgression}kg durante o exercício`,
-        );
+        performanceNotes.push(`Progressão de peso: +${weightProgression}kg durante o exercício`);
       }
     }
 
     // Análise de tempo
-    const totalDurationMinutes = Math.round(
-      execution.getTotalDurationMs() / (1000 * 60),
-    );
+    const totalDurationMinutes = Math.round(execution.getTotalDurationMs() / (1000 * 60));
     if (totalDurationMinutes > 15) {
       nextWorkoutSuggestions.push('Considere reduzir o tempo de descanso');
     } else if (totalDurationMinutes < 5) {
-      nextWorkoutSuggestions.push(
-        'Pode aumentar o tempo de descanso se necessário',
-      );
+      nextWorkoutSuggestions.push('Pode aumentar o tempo de descanso se necessário');
     }
 
     return {
@@ -258,10 +227,7 @@ export class FinishExerciseExecutionUseCase {
   /**
    * Calcula sugestão de peso para próxima série
    */
-  private calculateNextSetWeight(
-    completedSet: any,
-    actualReps: number,
-  ): number | null {
+  private calculateNextSetWeight(completedSet: any, actualReps: number): number | null {
     if (!completedSet.weight) return null;
 
     const plannedReps = completedSet.plannedReps;

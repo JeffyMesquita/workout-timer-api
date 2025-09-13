@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { WorkoutSessionRepository } from '../../domain/repositories/workout-session.repository';
+
 import { WorkoutPlanRepository } from '../../domain/repositories/workout-plan.repository';
+import { WorkoutSessionRepository } from '../../domain/repositories/workout-session.repository';
 
 // === PAUSE WORKOUT SESSION ===
 
@@ -29,28 +30,21 @@ export class PauseWorkoutSessionUseCase {
     private readonly workoutSessionRepository: WorkoutSessionRepository,
   ) {}
 
-  async execute(
-    input: PauseWorkoutSessionInput,
-  ): Promise<PauseWorkoutSessionOutput> {
+  async execute(input: PauseWorkoutSessionInput): Promise<PauseWorkoutSessionOutput> {
     const { userId, sessionId } = input;
 
     // Validar entrada
     this.validateInput(input);
 
     // Buscar a sessão
-    const session = await this.workoutSessionRepository.findByIdAndUserId(
-      sessionId,
-      userId,
-    );
+    const session = await this.workoutSessionRepository.findByIdAndUserId(sessionId, userId);
 
     if (!session) {
       throw new Error('Sessão de treino não encontrada');
     }
 
     if (!session.canBePaused()) {
-      throw new Error(
-        `Não é possível pausar uma sessão com status ${session.status}`,
-      );
+      throw new Error(`Não é possível pausar uma sessão com status ${session.status}`);
     }
 
     // Pausar a sessão
@@ -111,28 +105,21 @@ export class ResumeWorkoutSessionUseCase {
     private readonly workoutSessionRepository: WorkoutSessionRepository,
   ) {}
 
-  async execute(
-    input: ResumeWorkoutSessionInput,
-  ): Promise<ResumeWorkoutSessionOutput> {
+  async execute(input: ResumeWorkoutSessionInput): Promise<ResumeWorkoutSessionOutput> {
     const { userId, sessionId } = input;
 
     // Validar entrada
     this.validateInput(input);
 
     // Buscar a sessão
-    const session = await this.workoutSessionRepository.findByIdAndUserId(
-      sessionId,
-      userId,
-    );
+    const session = await this.workoutSessionRepository.findByIdAndUserId(sessionId, userId);
 
     if (!session) {
       throw new Error('Sessão de treino não encontrada');
     }
 
     if (!session.canBeResumed()) {
-      throw new Error(
-        `Não é possível retomar uma sessão com status ${session.status}`,
-      );
+      throw new Error(`Não é possível retomar uma sessão com status ${session.status}`);
     }
 
     // Retomar a sessão
@@ -201,34 +188,25 @@ export class CompleteWorkoutSessionUseCase {
     private readonly workoutPlanRepository: WorkoutPlanRepository,
   ) {}
 
-  async execute(
-    input: CompleteWorkoutSessionInput,
-  ): Promise<CompleteWorkoutSessionOutput> {
+  async execute(input: CompleteWorkoutSessionInput): Promise<CompleteWorkoutSessionOutput> {
     const { userId, sessionId, notes } = input;
 
     // Validar entrada
     this.validateInput(input);
 
     // Buscar a sessão
-    const session = await this.workoutSessionRepository.findByIdAndUserId(
-      sessionId,
-      userId,
-    );
+    const session = await this.workoutSessionRepository.findByIdAndUserId(sessionId, userId);
 
     if (!session) {
       throw new Error('Sessão de treino não encontrada');
     }
 
     if (!session.canBeCompleted()) {
-      throw new Error(
-        `Não é possível finalizar uma sessão com status ${session.status}`,
-      );
+      throw new Error(`Não é possível finalizar uma sessão com status ${session.status}`);
     }
 
     // Buscar informações do plano
-    const workoutPlan = await this.workoutPlanRepository.findById(
-      session.workoutPlanId,
-    );
+    const workoutPlan = await this.workoutPlanRepository.findById(session.workoutPlanId);
 
     if (!workoutPlan) {
       throw new Error('Plano de treino não encontrado');
@@ -245,9 +223,7 @@ export class CompleteWorkoutSessionUseCase {
     const exercisesCompleted = workoutPlan.exercises.length;
     const totalExercises = workoutPlan.exercises.length;
     const completionRate =
-      totalExercises > 0
-        ? Math.round((exercisesCompleted / totalExercises) * 100)
-        : 0;
+      totalExercises > 0 ? Math.round((exercisesCompleted / totalExercises) * 100) : 0;
 
     return {
       id: savedSession.id,
@@ -312,28 +288,21 @@ export class CancelWorkoutSessionUseCase {
     private readonly workoutSessionRepository: WorkoutSessionRepository,
   ) {}
 
-  async execute(
-    input: CancelWorkoutSessionInput,
-  ): Promise<CancelWorkoutSessionOutput> {
+  async execute(input: CancelWorkoutSessionInput): Promise<CancelWorkoutSessionOutput> {
     const { userId, sessionId, reason } = input;
 
     // Validar entrada
     this.validateInput(input);
 
     // Buscar a sessão
-    const session = await this.workoutSessionRepository.findByIdAndUserId(
-      sessionId,
-      userId,
-    );
+    const session = await this.workoutSessionRepository.findByIdAndUserId(sessionId, userId);
 
     if (!session) {
       throw new Error('Sessão de treino não encontrada');
     }
 
     if (!session.canBeCancelled()) {
-      throw new Error(
-        `Não é possível cancelar uma sessão com status ${session.status}`,
-      );
+      throw new Error(`Não é possível cancelar uma sessão com status ${session.status}`);
     }
 
     // Cancelar a sessão
@@ -363,9 +332,7 @@ export class CancelWorkoutSessionUseCase {
     }
 
     if (input.reason && input.reason.length > 200) {
-      throw new Error(
-        'Motivo do cancelamento deve ter no máximo 200 caracteres',
-      );
+      throw new Error('Motivo do cancelamento deve ter no máximo 200 caracteres');
     }
   }
 }

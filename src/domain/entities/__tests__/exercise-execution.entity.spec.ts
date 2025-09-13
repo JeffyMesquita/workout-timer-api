@@ -96,9 +96,7 @@ describe('ExerciseExecution', () => {
       exerciseExecution.start();
       exerciseExecution.complete();
 
-      expect(() => exerciseExecution.skip()).toThrow(
-        'Cannot skip a completed exercise execution',
-      );
+      expect(() => exerciseExecution.skip()).toThrow('Cannot skip a completed exercise execution');
     });
   });
 
@@ -140,9 +138,7 @@ describe('ExerciseExecution', () => {
         10,
       );
 
-      expect(() => exerciseExecution.addSet(duplicateSet)).toThrow(
-        'Set number 1 already exists',
-      );
+      expect(() => exerciseExecution.addSet(duplicateSet)).toThrow('Set number 1 already exists');
     });
   });
 
@@ -162,9 +158,7 @@ describe('ExerciseExecution', () => {
     });
 
     it('should throw error for non-existent set', () => {
-      expect(() => exerciseExecution.updateSet(2, 10)).toThrow(
-        'Set number 2 not found',
-      );
+      expect(() => exerciseExecution.updateSet(2, 10)).toThrow('Set number 2 not found');
     });
   });
 
@@ -181,9 +175,7 @@ describe('ExerciseExecution', () => {
     });
 
     it('should throw error for non-existent set', () => {
-      expect(() => exerciseExecution.removeSet(2)).toThrow(
-        'Set number 2 not found',
-      );
+      expect(() => exerciseExecution.removeSet(2)).toThrow('Set number 2 not found');
     });
   });
 

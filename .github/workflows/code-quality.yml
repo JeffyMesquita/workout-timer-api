@@ -1,0 +1,315 @@
+name: 📊 Code Quality Analysis
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+  schedule:
+    - cron: '0 6 * * 1' # Every Monday at 6 AM UTC
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10.0.0'
+
+jobs:
+  # Job 1: Code Analysis
+  code-analysis:
+    name: 🔍 Code Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for better analysis
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Generate Prisma Client
+        run: pnpm prisma:generate
+
+      - name: 🔍 Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: typescript, javascript
+
+      - name: 🏗️ Build for analysis
+        run: pnpm build
+
+      - name: 🔍 Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: '/language:typescript'
+
+      - name: 📊 ESLint Analysis
+        run: |
+          pnpm lint:check --format=json --output-file=eslint-report.json || true
+
+      - name: 📤 Upload ESLint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-report
+          path: eslint-report.json
+
+  # Job 2: Test Coverage Analysis
+  coverage-analysis:
+    name: 📈 Coverage Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Generate Prisma Client
+        run: pnpm prisma:generate
+
+      - name: 📊 Generate detailed coverage
+        run: |
+          pnpm test:coverage --coverageReporters=lcov --coverageReporters=json-summary --coverageReporters=text
+
+      - name: 📈 Coverage threshold check
+        run: |
+          COVERAGE=$(node -e "console.log(JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.lines.pct)")
+          echo "Current coverage: ${COVERAGE}%"
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "❌ Coverage is below 80% threshold"
+            exit 1
+          else
+            echo "✅ Coverage meets 80% threshold"
+          fi
+
+      - name: 📊 Coverage comment on PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          message: |
+            ## 📊 Test Coverage Report
+
+            | Metric | Coverage |
+            |--------|----------|
+            | Lines | ![Coverage](https://img.shields.io/badge/Lines-$(node -e "console.log(JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.lines.pct)")%25-brightgreen) |
+            | Functions | ![Coverage](https://img.shields.io/badge/Functions-$(node -e "console.log(JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.functions.pct)")%25-brightgreen) |
+            | Branches | ![Coverage](https://img.shields.io/badge/Branches-$(node -e "console.log(JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.branches.pct)")%25-brightgreen) |
+            | Statements | ![Coverage](https://img.shields.io/badge/Statements-$(node -e "console.log(JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.statements.pct)")%25-brightgreen) |
+
+  # Job 3: Architecture Compliance
+  architecture-check:
+    name: 🏗️ Architecture Compliance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 🏗️ Check hexagonal architecture compliance
+        run: |
+          echo "🏗️ Checking hexagonal architecture compliance..."
+
+          # Check domain layer doesn't import infrastructure
+          if grep -r "infrastructure" src/domain/; then
+            echo "❌ Domain layer should not import infrastructure"
+            exit 1
+          fi
+
+          # Check application layer doesn't import infrastructure directly
+          if grep -r "infrastructure" src/application/ | grep -v "repositories"; then
+            echo "❌ Application layer should only import repository interfaces"
+            exit 1
+          fi
+
+          echo "✅ Architecture compliance verified"
+
+      - name: 📊 Dependency graph analysis
+        run: |
+          echo "📊 Analyzing dependency graph..."
+
+          # Count files by layer
+          DOMAIN_FILES=$(find src/domain -name "*.ts" | wc -l)
+          APPLICATION_FILES=$(find src/application -name "*.ts" | wc -l)
+          INFRASTRUCTURE_FILES=$(find src/infrastructure -name "*.ts" | wc -l)
+          PRESENTATION_FILES=$(find src/presentation -name "*.ts" | wc -l)
+
+          echo "## 🏗️ Architecture Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Layer | Files |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Domain | $DOMAIN_FILES |" >> $GITHUB_STEP_SUMMARY
+          echo "| Application | $APPLICATION_FILES |" >> $GITHUB_STEP_SUMMARY
+          echo "| Infrastructure | $INFRASTRUCTURE_FILES |" >> $GITHUB_STEP_SUMMARY
+          echo "| Presentation | $PRESENTATION_FILES |" >> $GITHUB_STEP_SUMMARY
+
+  # Job 4: Performance Monitoring
+  performance-monitoring:
+    name: ⚡ Performance Monitoring
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.ref == 'refs/heads/main'
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: workout_timer_perf
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres123
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Generate Prisma Client
+        run: pnpm prisma:generate
+
+      - name: 🗄️ Setup database
+        env:
+          DATABASE_URL: postgresql://postgres:postgres123@localhost:5432/workout_timer_perf
+        run: pnpm prisma db push
+
+      - name: 🏗️ Build application
+        run: pnpm build
+
+      - name: 🚀 Start API for performance testing
+        env:
+          DATABASE_URL: postgresql://postgres:postgres123@localhost:5432/workout_timer_perf
+          JWT_SECRET: test-jwt-secret
+          JWT_REFRESH_SECRET: test-jwt-refresh-secret
+        run: |
+          pnpm start &
+          sleep 10
+
+      - name: ⚡ Run performance tests
+        run: |
+          echo "⚡ Running performance benchmarks..."
+
+          # Test API response time
+          RESPONSE_TIME=$(curl -o /dev/null -s -w "%{time_total}" http://localhost:3000)
+          echo "API Response Time: ${RESPONSE_TIME}s"
+
+          # Performance threshold check
+          if (( $(echo "$RESPONSE_TIME > 2.0" | bc -l) )); then
+            echo "❌ API response time is too slow: ${RESPONSE_TIME}s"
+            exit 1
+          fi
+
+          echo "✅ Performance tests passed"
+
+      - name: 📊 Performance summary
+        run: |
+          echo "## ⚡ Performance Summary" >> $GITHUB_STEP_SUMMARY
+          echo "**API Response Time:** $(curl -o /dev/null -s -w "%{time_total}" http://localhost:3000)s" >> $GITHUB_STEP_SUMMARY
+          echo "**Threshold:** < 2.0s ✅" >> $GITHUB_STEP_SUMMARY
+
+  # Job 5: Documentation Update
+  update-docs:
+    name: 📚 Update Documentation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📚 Generate API documentation
+        run: |
+          echo "📚 Generating API documentation..."
+
+          # Count endpoints
+          ENDPOINTS=$(grep -r "@Get\|@Post\|@Put\|@Delete" src/presentation/ | wc -l)
+
+          # Update README with latest stats
+          echo "## 📊 API Stats" > API_STATS.md
+          echo "- **Endpoints:** $ENDPOINTS" >> API_STATS.md
+          echo "- **Last Updated:** $(date)" >> API_STATS.md
+          echo "- **Version:** ${{ github.sha }}" >> API_STATS.md
+
+      - name: 📤 Commit documentation updates
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add API_STATS.md
+          git diff --staged --quiet || git commit -m "docs: update API stats [skip ci]"
+          git push || true
+
+  # Job 6: Notification
+  notify-completion:
+    name: 📢 Notify Completion
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [deploy-production]
+    if: always()
+
+    steps:
+      - name: 📢 Deployment notification
+        run: |
+          if [ "${{ needs.deploy-production.result }}" == "success" ]; then
+            echo "🎉 Deployment completed successfully!"
+            echo "## 🎉 Deployment Success" >> $GITHUB_STEP_SUMMARY
+            echo "**Production URL:** https://workout-timer-api.herokuapp.com" >> $GITHUB_STEP_SUMMARY
+            echo "**Docker Image:** ${{ needs.build-and-push.outputs.image-tag }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Deployment failed or was skipped"
+            echo "## ❌ Deployment Status" >> $GITHUB_STEP_SUMMARY
+            echo "**Status:** Failed or Skipped" >> $GITHUB_STEP_SUMMARY
+          fi

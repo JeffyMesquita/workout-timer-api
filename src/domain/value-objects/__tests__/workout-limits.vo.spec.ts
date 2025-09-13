@@ -159,17 +159,13 @@ describe('WorkoutLimits', () => {
     it('should return correct message for limited plans', () => {
       const limits = WorkoutLimits.createFreeTierLimits();
 
-      expect(limits.getWorkoutPlanLimitMessage()).toBe(
-        'Máximo de 2 planos de treino',
-      );
+      expect(limits.getWorkoutPlanLimitMessage()).toBe('Máximo de 2 planos de treino');
     });
 
     it('should return correct message for unlimited plans', () => {
       const limits = WorkoutLimits.createPremiumLimits();
 
-      expect(limits.getWorkoutPlanLimitMessage()).toBe(
-        'Planos de treino ilimitados',
-      );
+      expect(limits.getWorkoutPlanLimitMessage()).toBe('Planos de treino ilimitados');
     });
   });
 
@@ -177,17 +173,13 @@ describe('WorkoutLimits', () => {
     it('should return correct message for limited exercises', () => {
       const limits = WorkoutLimits.createFreeTierLimits();
 
-      expect(limits.getExerciseLimitMessage()).toBe(
-        'Máximo de 5 exercícios por plano',
-      );
+      expect(limits.getExerciseLimitMessage()).toBe('Máximo de 5 exercícios por plano');
     });
 
     it('should return correct message for unlimited exercises', () => {
       const limits = WorkoutLimits.createPremiumLimits();
 
-      expect(limits.getExerciseLimitMessage()).toBe(
-        'Exercícios ilimitados por plano',
-      );
+      expect(limits.getExerciseLimitMessage()).toBe('Exercícios ilimitados por plano');
     });
   });
 
@@ -199,9 +191,7 @@ describe('WorkoutLimits', () => {
       expect(summary.workoutPlans).toBe('Máximo de 2 planos de treino');
       expect(summary.exercises).toBe('Máximo de 5 exercícios por plano');
       expect(summary.history).toBe('Histórico de 30 dias');
-      expect(summary.trainer).toBe(
-        'Funcionalidades de treinador não disponíveis',
-      );
+      expect(summary.trainer).toBe('Funcionalidades de treinador não disponíveis');
     });
 
     it('should return correct summary for premium', () => {

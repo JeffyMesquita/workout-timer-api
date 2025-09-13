@@ -1,9 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import type { INestApplication } from '@nestjs/common';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
+
 import * as request from 'supertest';
+
 import { AppModule } from '../../app.module';
-import { PrismaService } from '../../infrastructure/database/prisma.service';
 import { JwtServiceLocal } from '../../infrastructure/auth/jwt.service';
+import { PrismaService } from '../../infrastructure/database/prisma.service';
 
 describe('WorkoutPlanController (E2E)', () => {
   let app: INestApplication;
@@ -92,10 +95,7 @@ describe('WorkoutPlanController (E2E)', () => {
         name: 'Treino A',
       };
 
-      await request(app.getHttpServer())
-        .post('/workout-plans')
-        .send(createDto)
-        .expect(401);
+      await request(app.getHttpServer()).post('/workout-plans').send(createDto).expect(401);
     });
 
     it('should return 400 for invalid input', async () => {
@@ -232,9 +232,7 @@ describe('WorkoutPlanController (E2E)', () => {
 
   describe('GET /workout-plans/:id', () => {
     it('should return 401 without authentication', async () => {
-      await request(app.getHttpServer())
-        .get('/workout-plans/some-id')
-        .expect(401);
+      await request(app.getHttpServer()).get('/workout-plans/some-id').expect(401);
     });
 
     it('should return workout plan placeholder', async () => {
@@ -276,9 +274,7 @@ describe('WorkoutPlanController (E2E)', () => {
 
   describe('DELETE /workout-plans/:id', () => {
     it('should return 401 without authentication', async () => {
-      await request(app.getHttpServer())
-        .delete('/workout-plans/some-id')
-        .expect(401);
+      await request(app.getHttpServer()).delete('/workout-plans/some-id').expect(401);
     });
 
     it('should return delete placeholder', async () => {
@@ -296,9 +292,7 @@ describe('WorkoutPlanController (E2E)', () => {
 
   describe('GET /workout-plans/:id/exercises', () => {
     it('should return 401 without authentication', async () => {
-      await request(app.getHttpServer())
-        .get('/workout-plans/some-id/exercises')
-        .expect(401);
+      await request(app.getHttpServer()).get('/workout-plans/some-id/exercises').expect(401);
     });
 
     it('should return exercises placeholder', async () => {

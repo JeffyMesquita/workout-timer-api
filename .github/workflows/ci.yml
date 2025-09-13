@@ -1,0 +1,518 @@
+name: 🧪 Continuous Integration
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10.0.0'
+
+jobs:
+  # Job 1: Code Quality Checks
+  code-quality:
+    name: 🔍 Code Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🗄️ Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: 🎯 Cache pnpm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Generate Prisma Client
+        run: pnpm prisma:generate
+
+      - name: 🔍 Type Check
+        run: pnpm type-check
+
+      - name: 📝 Lint Check
+        run: pnpm lint:check
+
+      - name: 🎨 Format Check
+        run: pnpm format:check
+
+      - name: 📊 Upload lint results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-results
+          path: |
+            eslint-report.json
+            prettier-report.json
+
+  # Job 2: Unit Tests
+  unit-tests:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: code-quality
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🗄️ Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: 🎯 Cache pnpm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Generate Prisma Client
+        run: pnpm prisma:generate
+
+      - name: 🧪 Run unit tests
+        run: pnpm test:unit
+
+      - name: 📊 Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: |
+            coverage/
+            junit.xml
+
+  # Job 3: Integration Tests
+  integration-tests:
+    name: 🔗 Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: unit-tests
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: workout_timer_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres123
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 3s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🗄️ Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: 🎯 Cache pnpm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Generate Prisma Client
+        run: pnpm prisma:generate
+
+      - name: 🗄️ Setup test database
+        env:
+          DATABASE_URL: postgresql://postgres:postgres123@localhost:5432/workout_timer_test
+        run: |
+          pnpm prisma db push --force-reset
+
+      - name: 🔗 Run integration tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres123@localhost:5432/workout_timer_test
+          REDIS_URL: redis://localhost:6379
+        run: pnpm test:integration
+
+      - name: 📊 Upload integration test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: |
+            coverage/
+            integration-junit.xml
+
+  # Job 4: E2E Tests
+  e2e-tests:
+    name: 🌐 E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: integration-tests
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: workout_timer_e2e
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres123
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 3s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🗄️ Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: 🎯 Cache pnpm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Generate Prisma Client
+        run: pnpm prisma:generate
+
+      - name: 🗄️ Setup E2E database
+        env:
+          DATABASE_URL: postgresql://postgres:postgres123@localhost:5432/workout_timer_e2e
+        run: |
+          pnpm prisma db push --force-reset
+
+      - name: 🏗️ Build application
+        run: pnpm build
+
+      - name: 🌐 Run E2E tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres123@localhost:5432/workout_timer_e2e
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-jwt-secret-for-e2e
+          JWT_REFRESH_SECRET: test-jwt-refresh-secret-for-e2e
+        run: pnpm test:e2e
+
+      - name: 📊 Upload E2E test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results
+          path: |
+            coverage/
+            e2e-junit.xml
+
+  # Job 5: Build and Security Scan
+  build-and-security:
+    name: 🏗️ Build & Security
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: code-quality
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🗄️ Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: 🎯 Cache pnpm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Generate Prisma Client
+        run: pnpm prisma:generate
+
+      - name: 🏗️ Build application
+        run: pnpm build
+
+      - name: 🔒 Run security audit
+        run: pnpm audit --audit-level moderate
+
+      - name: 🔍 Check for vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: 📊 Upload security scan results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # Job 6: Docker Build Test
+  docker-build:
+    name: 🐳 Docker Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [unit-tests, build-and-security]
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🏗️ Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: workout-timer-api:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 🧪 Test Docker image
+        run: |
+          docker run --rm workout-timer-api:test node --version
+          docker run --rm workout-timer-api:test pnpm --version
+
+  # Job 7: Coverage Report
+  coverage-report:
+    name: 📊 Coverage Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [unit-tests, integration-tests]
+    if: always()
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Generate Prisma Client
+        run: pnpm prisma:generate
+
+      - name: 📊 Generate coverage report
+        run: pnpm test:coverage
+
+      - name: 📤 Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: workout-timer-api
+          fail_ci_if_error: false
+
+      - name: 📊 Coverage Summary
+        run: |
+          echo "## 📊 Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          echo "$(cat coverage/coverage-summary.json)" >> $GITHUB_STEP_SUMMARY
+
+  # Job 8: Performance Tests
+  performance-tests:
+    name: ⚡ Performance Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: docker-build
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: workout_timer_perf
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres123
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🏗️ Build and run API
+        run: |
+          docker-compose -f docker-compose.yml up -d --build
+          sleep 30
+
+      - name: ⚡ Run performance tests
+        run: |
+          curl -f http://localhost:3000 || exit 1
+          echo "API is responding successfully"
+
+      - name: 🧹 Cleanup
+        if: always()
+        run: docker-compose down -v
+
+  # Job 9: Dependency Check
+  dependency-check:
+    name: 🔒 Dependency Security
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔒 Security audit
+        run: pnpm audit --audit-level moderate
+
+      - name: 🔍 Check outdated packages
+        run: pnpm outdated || true
+
+      - name: 📊 License check
+        run: |
+          npx license-checker --summary > license-summary.txt
+          cat license-summary.txt
+
+      - name: 📤 Upload dependency reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-reports
+          path: |
+            license-summary.txt
+            audit-report.json

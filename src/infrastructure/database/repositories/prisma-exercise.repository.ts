@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
-import { ExerciseRepository } from '../../../domain/repositories/exercise.repository';
+
 import { Exercise } from '../../../domain/entities/exercise.entity';
+import { ExerciseRepository } from '../../../domain/repositories/exercise.repository';
+import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class PrismaExerciseRepository implements ExerciseRepository {
@@ -113,10 +114,7 @@ export class PrismaExerciseRepository implements ExerciseRepository {
     return count > 0;
   }
 
-  async findByMuscleGroup(
-    workoutPlanId: string,
-    muscleGroup: string,
-  ): Promise<Exercise[]> {
+  async findByMuscleGroup(workoutPlanId: string, muscleGroup: string): Promise<Exercise[]> {
     const exercises = await this.prisma.exercise.findMany({
       where: {
         workoutPlanId,
@@ -142,9 +140,7 @@ export class PrismaExerciseRepository implements ExerciseRepository {
     return (maxOrder._max.order || 0) + 1;
   }
 
-  async updateOrders(
-    exercises: { id: string; order: number }[],
-  ): Promise<void> {
+  async updateOrders(exercises: { id: string; order: number }[]): Promise<void> {
     // Usar transação para garantir consistência
     await this.prisma.$transaction(
       exercises.map((exercise) =>

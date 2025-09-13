@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
-import { WorkoutPlanRepository } from '../../../domain/repositories/workout-plan.repository';
-import { WorkoutPlan } from '../../../domain/entities/workout-plan.entity';
+
 import { Exercise } from '../../../domain/entities/exercise.entity';
+import { WorkoutPlan } from '../../../domain/entities/workout-plan.entity';
+import { WorkoutPlanRepository } from '../../../domain/repositories/workout-plan.repository';
+import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class PrismaWorkoutPlanRepository implements WorkoutPlanRepository {
@@ -21,10 +22,7 @@ export class PrismaWorkoutPlanRepository implements WorkoutPlanRepository {
     return plan ? this.toDomainEntity(plan) : null;
   }
 
-  async findByIdAndUserId(
-    id: string,
-    userId: string,
-  ): Promise<WorkoutPlan | null> {
+  async findByIdAndUserId(id: string, userId: string): Promise<WorkoutPlan | null> {
     const plan = await this.prisma.workoutPlan.findFirst({
       where: {
         id,
@@ -145,11 +143,7 @@ export class PrismaWorkoutPlanRepository implements WorkoutPlanRepository {
     return count > 0;
   }
 
-  async existsByUserIdAndName(
-    userId: string,
-    name: string,
-    excludeId?: string,
-  ): Promise<boolean> {
+  async existsByUserIdAndName(userId: string, name: string, excludeId?: string): Promise<boolean> {
     const whereClause: any = {
       userId,
       name: {
@@ -215,10 +209,7 @@ export class PrismaWorkoutPlanRepository implements WorkoutPlanRepository {
     };
   }
 
-  async searchByName(
-    userId: string,
-    searchTerm: string,
-  ): Promise<WorkoutPlan[]> {
+  async searchByName(userId: string, searchTerm: string): Promise<WorkoutPlan[]> {
     const plans = await this.prisma.workoutPlan.findMany({
       where: {
         userId,

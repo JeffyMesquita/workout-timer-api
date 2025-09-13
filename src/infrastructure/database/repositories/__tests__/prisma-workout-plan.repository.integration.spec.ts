@@ -1,8 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
+
+import { WorkoutPlan } from '../../../../domain/entities/workout-plan.entity';
 import { PrismaService } from '../../prisma.service';
 import { PrismaWorkoutPlanRepository } from '../prisma-workout-plan.repository';
-import { WorkoutPlan } from '../../../../domain/entities/workout-plan.entity';
-import { Exercise } from '../../../../domain/entities/exercise.entity';
 
 describe('PrismaWorkoutPlanRepository (Integration)', () => {
   let repository: PrismaWorkoutPlanRepository;
@@ -15,9 +16,7 @@ describe('PrismaWorkoutPlanRepository (Integration)', () => {
     }).compile();
 
     prisma = module.get<PrismaService>(PrismaService);
-    repository = module.get<PrismaWorkoutPlanRepository>(
-      PrismaWorkoutPlanRepository,
-    );
+    repository = module.get<PrismaWorkoutPlanRepository>(PrismaWorkoutPlanRepository);
 
     await prisma.$connect();
   });
@@ -198,35 +197,22 @@ describe('PrismaWorkoutPlanRepository (Integration)', () => {
     });
 
     it('should return true for existing name', async () => {
-      const exists = await repository.existsByUserIdAndName(
-        'test-user-1',
-        'Treino A',
-      );
+      const exists = await repository.existsByUserIdAndName('test-user-1', 'Treino A');
       expect(exists).toBe(true);
     });
 
     it('should return false for non-existing name', async () => {
-      const exists = await repository.existsByUserIdAndName(
-        'test-user-1',
-        'Treino B',
-      );
+      const exists = await repository.existsByUserIdAndName('test-user-1', 'Treino B');
       expect(exists).toBe(false);
     });
 
     it('should be case insensitive', async () => {
-      const exists = await repository.existsByUserIdAndName(
-        'test-user-1',
-        'treino a',
-      );
+      const exists = await repository.existsByUserIdAndName('test-user-1', 'treino a');
       expect(exists).toBe(true);
     });
 
     it('should exclude specific ID when provided', async () => {
-      const exists = await repository.existsByUserIdAndName(
-        'test-user-1',
-        'Treino A',
-        'plan-1',
-      );
+      const exists = await repository.existsByUserIdAndName('test-user-1', 'Treino A', 'plan-1');
       expect(exists).toBe(false);
     });
   });
@@ -260,13 +246,7 @@ describe('PrismaWorkoutPlanRepository (Integration)', () => {
 
   describe('delete', () => {
     it('should delete workout plan', async () => {
-      const workoutPlan = new WorkoutPlan(
-        'plan-1',
-        'test-user-1',
-        'Treino A',
-        null,
-        true,
-      );
+      const workoutPlan = new WorkoutPlan('plan-1', 'test-user-1', 'Treino A', null, true);
 
       await repository.save(workoutPlan);
 
@@ -367,10 +347,7 @@ describe('PrismaWorkoutPlanRepository (Integration)', () => {
     });
 
     it('should return empty array for no matches', async () => {
-      const results = await repository.searchByName(
-        'test-user-1',
-        'NonExistent',
-      );
+      const results = await repository.searchByName('test-user-1', 'NonExistent');
 
       expect(results).toHaveLength(0);
     });

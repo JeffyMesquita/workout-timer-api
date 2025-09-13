@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+
 import { SubscriptionRepository } from '../../domain/repositories/subscription.repository';
 
 @Injectable()

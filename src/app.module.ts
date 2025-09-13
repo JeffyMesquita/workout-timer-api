@@ -1,15 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
-import { PrismaService } from './infrastructure/database/prisma.service';
-import { SubscriptionController } from './presentation/subscription.controller';
-import { AuthController } from './presentation/auth.controller';
-import { WorkoutPlanController } from './presentation/workout-plan.controller';
-import { WorkoutSessionController } from './presentation/workout-session.controller';
-import { ExerciseExecutionController } from './presentation/exercise-execution.controller';
-import { GooglePlayClient } from './infrastructure/google-play/google-play.client';
-import { GooglePlayService } from './infrastructure/google-play/google-play.service';
-import { JwtServiceLocal } from './infrastructure/auth/jwt.service';
+
 import { GoogleIdTokenVerifier } from './infrastructure/auth/google.strategy';
 import { AppleIdTokenVerifier } from './infrastructure/auth/apple.strategy';
 import { PrismaSubscriptionRepository } from './infrastructure/database/repositories/prisma-subscription.repository';
@@ -38,10 +30,21 @@ import { StartExerciseExecutionUseCase } from './application/use-cases/start-exe
 import { CompleteSetUseCase } from './application/use-cases/complete-set.usecase';
 import { FinishExerciseExecutionUseCase } from './application/use-cases/finish-exercise-execution.usecase';
 import { WorkoutLimitServiceImpl } from './domain/services/workout-limit.service';
+import { JwtServiceLocal } from './infrastructure/auth/jwt.service';
+import { PrismaService } from './infrastructure/database/prisma.service';
+import { GooglePlayClient } from './infrastructure/google-play/google-play.client';
+import { GooglePlayService } from './infrastructure/google-play/google-play.service';
+import { AuthController } from './presentation/auth.controller';
+import { ExerciseExecutionController } from './presentation/exercise-execution.controller';
+import { HealthController } from './presentation/health.controller';
+import { SubscriptionController } from './presentation/subscription.controller';
+import { WorkoutPlanController } from './presentation/workout-plan.controller';
+import { WorkoutSessionController } from './presentation/workout-session.controller';
 
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true }), ScheduleModule.forRoot()],
   controllers: [
+    HealthController,
     SubscriptionController,
     AuthController,
     WorkoutPlanController,

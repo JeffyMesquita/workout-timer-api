@@ -1,4 +1,4 @@
-import { WorkoutPlan } from '../entities/workout-plan.entity';
+import type { WorkoutPlan } from '../entities/workout-plan.entity';
 
 export interface WorkoutPlanRepository {
   /**
@@ -49,11 +49,7 @@ export interface WorkoutPlanRepository {
   /**
    * Verifica se um usuário possui um plano com determinado nome
    */
-  existsByUserIdAndName(
-    userId: string,
-    name: string,
-    excludeId?: string,
-  ): Promise<boolean>;
+  existsByUserIdAndName(userId: string, name: string, excludeId?: string): Promise<boolean>;
 
   /**
    * Busca planos de treino com paginação

@@ -1,5 +1,4 @@
 import { WorkoutLimits } from '../value-objects/workout-limits.vo';
-import { WorkoutPlan } from '../entities/workout-plan.entity';
 
 export interface WorkoutLimitService {
   /**
@@ -31,10 +30,7 @@ export interface WorkoutLimitService {
   /**
    * Valida se o histórico pode ser acessado para uma data específica
    */
-  validateHistoryAccess(
-    date: Date,
-    isPremium: boolean,
-  ): Promise<ValidationResult>;
+  validateHistoryAccess(date: Date, isPremium: boolean): Promise<ValidationResult>;
 }
 
 export interface ValidationResult {
@@ -46,9 +42,7 @@ export interface ValidationResult {
 
 export class WorkoutLimitServiceImpl implements WorkoutLimitService {
   getLimitsForUser(isPremium: boolean): WorkoutLimits {
-    return isPremium
-      ? WorkoutLimits.createPremiumLimits()
-      : WorkoutLimits.createFreeTierLimits();
+    return isPremium ? WorkoutLimits.createPremiumLimits() : WorkoutLimits.createFreeTierLimits();
   }
 
   async validateCanCreateWorkoutPlan(
@@ -106,15 +100,11 @@ export class WorkoutLimitServiceImpl implements WorkoutLimitService {
 
     return {
       isValid: false,
-      message:
-        'Funcionalidades de treinador disponíveis apenas para usuários Premium.',
+      message: 'Funcionalidades de treinador disponíveis apenas para usuários Premium.',
     };
   }
 
-  async validateHistoryAccess(
-    date: Date,
-    isPremium: boolean,
-  ): Promise<ValidationResult> {
+  async validateHistoryAccess(date: Date, isPremium: boolean): Promise<ValidationResult> {
     const limits = this.getLimitsForUser(isPremium);
 
     if (limits.shouldRetainHistory(date)) {

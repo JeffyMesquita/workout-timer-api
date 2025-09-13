@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
-import { ExerciseExecutionRepository } from '../../../domain/repositories/exercise-execution.repository';
+
 import { ExerciseExecution } from '../../../domain/entities/exercise-execution.entity';
 import { WorkoutSet } from '../../../domain/entities/set.entity';
+import { ExerciseExecutionRepository } from '../../../domain/repositories/exercise-execution.repository';
+import { PrismaService } from '../prisma.service';
 
 @Injectable()
-export class PrismaExerciseExecutionRepository
-  implements ExerciseExecutionRepository
-{
+export class PrismaExerciseExecutionRepository implements ExerciseExecutionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findById(id: string): Promise<ExerciseExecution | null> {
@@ -23,9 +22,7 @@ export class PrismaExerciseExecutionRepository
     return execution ? this.toDomainEntity(execution) : null;
   }
 
-  async findByWorkoutSessionId(
-    workoutSessionId: string,
-  ): Promise<ExerciseExecution[]> {
+  async findByWorkoutSessionId(workoutSessionId: string): Promise<ExerciseExecution[]> {
     const executions = await this.prisma.exerciseExecution.findMany({
       where: { workoutSessionId },
       include: {
@@ -72,9 +69,7 @@ export class PrismaExerciseExecutionRepository
     return executions.map((execution) => this.toDomainEntity(execution));
   }
 
-  async findActiveByWorkoutSessionId(
-    workoutSessionId: string,
-  ): Promise<ExerciseExecution[]> {
+  async findActiveByWorkoutSessionId(workoutSessionId: string): Promise<ExerciseExecution[]> {
     const executions = await this.prisma.exerciseExecution.findMany({
       where: {
         workoutSessionId,
@@ -157,9 +152,7 @@ export class PrismaExerciseExecutionRepository
     });
   }
 
-  async findLastByExerciseId(
-    exerciseId: string,
-  ): Promise<ExerciseExecution | null> {
+  async findLastByExerciseId(exerciseId: string): Promise<ExerciseExecution | null> {
     const execution = await this.prisma.exerciseExecution.findFirst({
       where: {
         exerciseId,
@@ -273,9 +266,7 @@ export class PrismaExerciseExecutionRepository
       ? {
           maxReps: bestPerformanceSet.actualReps || 0,
           maxWeight: bestPerformanceSet.weight,
-          date:
-            bestPerformanceSet.exerciseExecution.completedAt ||
-            bestPerformanceSet.createdAt,
+          date: bestPerformanceSet.exerciseExecution.completedAt || bestPerformanceSet.createdAt,
         }
       : null;
 
@@ -284,9 +275,7 @@ export class PrismaExerciseExecutionRepository
       completedExecutions,
       averageReps: Math.round(setStats._avg.actualReps || 0),
       maxWeight: setStats._max.weight,
-      averageWeight: setStats._avg.weight
-        ? Math.round(setStats._avg.weight * 100) / 100
-        : null,
+      averageWeight: setStats._avg.weight ? Math.round(setStats._avg.weight * 100) / 100 : null,
       bestPerformance,
     };
   }
@@ -296,9 +285,9 @@ export class PrismaExerciseExecutionRepository
    */
   private toDomainEntity(prismaEntity: any): ExerciseExecution {
     const sets =
-       prismaEntity.sets?.map(
-         (set: any) =>
-           new WorkoutSet(
+      prismaEntity.sets?.map(
+        (set: any) =>
+          new WorkoutSet(
             set.id,
             set.exerciseExecutionId,
             set.setNumber,

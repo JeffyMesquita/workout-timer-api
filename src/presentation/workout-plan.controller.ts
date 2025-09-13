@@ -12,36 +12,37 @@ import {
   HttpStatus,
   HttpException,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../infrastructure/auth/jwt.guard';
-import {
-  CreateWorkoutPlanUseCase,
-  CreateWorkoutPlanInput,
-} from '../application/use-cases/create-workout-plan.usecase';
-import {
-  ListWorkoutPlansUseCase,
-  ListWorkoutPlansInput,
-} from '../application/use-cases/list-workout-plans.usecase';
-import {
-  GetWorkoutPlanByIdUseCase,
-  GetWorkoutPlanByIdInput,
-} from '../application/use-cases/get-workout-plan-by-id.usecase';
-import {
-  UpdateWorkoutPlanUseCase,
-  UpdateWorkoutPlanInput,
-} from '../application/use-cases/update-workout-plan.usecase';
-import {
-  DeleteWorkoutPlanUseCase,
-  DeleteWorkoutPlanInput,
-} from '../application/use-cases/delete-workout-plan.usecase';
+
 import {
   AddExerciseToWorkoutPlanUseCase,
   AddExerciseToWorkoutPlanInput,
 } from '../application/use-cases/add-exercise-to-workout-plan.usecase';
 import {
+  CreateWorkoutPlanUseCase,
+  CreateWorkoutPlanInput,
+} from '../application/use-cases/create-workout-plan.usecase';
+import {
+  DeleteWorkoutPlanUseCase,
+  DeleteWorkoutPlanInput,
+} from '../application/use-cases/delete-workout-plan.usecase';
+import {
+  GetWorkoutPlanByIdUseCase,
+  GetWorkoutPlanByIdInput,
+} from '../application/use-cases/get-workout-plan-by-id.usecase';
+import {
   ListExercisesByPlanUseCase,
   ListExercisesByPlanInput,
 } from '../application/use-cases/list-exercises-by-plan.usecase';
+import {
+  ListWorkoutPlansUseCase,
+  ListWorkoutPlansInput,
+} from '../application/use-cases/list-workout-plans.usecase';
+import {
+  UpdateWorkoutPlanUseCase,
+  UpdateWorkoutPlanInput,
+} from '../application/use-cases/update-workout-plan.usecase';
 import { WorkoutLimitExceededException } from '../domain/services/workout-limit.service';
+import { JwtAuthGuard } from '../infrastructure/auth/jwt.guard';
 
 // DTOs
 export class CreateWorkoutPlanDto {
@@ -213,11 +214,7 @@ export class WorkoutPlanController {
   }
 
   @Put(':id')
-  async update(
-    @Req() req: any,
-    @Param('id') id: string,
-    @Body() dto: UpdateWorkoutPlanDto,
-  ) {
+  async update(@Req() req: any, @Param('id') id: string, @Body() dto: UpdateWorkoutPlanDto) {
     try {
       const input: UpdateWorkoutPlanInput = {
         userId: req.user.id,
@@ -271,11 +268,7 @@ export class WorkoutPlanController {
   }
 
   @Delete(':id')
-  async delete(
-    @Req() req: any,
-    @Param('id') id: string,
-    @Query('force') force?: string,
-  ) {
+  async delete(@Req() req: any, @Param('id') id: string, @Query('force') force?: string) {
     try {
       const input: DeleteWorkoutPlanInput = {
         userId: req.user.id,
@@ -304,10 +297,7 @@ export class WorkoutPlanController {
         );
       }
 
-      if (
-        errorMessage.includes('exercícios') ||
-        errorMessage.includes('em uso')
-      ) {
+      if (errorMessage.includes('exercícios') || errorMessage.includes('em uso')) {
         throw new HttpException(
           {
             success: false,

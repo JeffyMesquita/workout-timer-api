@@ -1,5 +1,5 @@
-import { WorkoutPlan } from '../workout-plan.entity';
 import { Exercise } from '../exercise.entity';
+import { WorkoutPlan } from '../workout-plan.entity';
 
 describe('WorkoutPlan', () => {
   let workoutPlan: WorkoutPlan;

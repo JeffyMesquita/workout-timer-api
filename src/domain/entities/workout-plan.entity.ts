@@ -1,4 +1,4 @@
-import { Exercise } from './exercise.entity';
+import type { Exercise } from './exercise.entity';
 
 export class WorkoutPlan {
   constructor(

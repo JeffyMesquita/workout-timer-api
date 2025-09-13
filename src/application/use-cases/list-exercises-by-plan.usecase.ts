@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { WorkoutPlanRepository } from '../../domain/repositories/workout-plan.repository';
+
 import { ExerciseRepository } from '../../domain/repositories/exercise.repository';
+import { WorkoutPlanRepository } from '../../domain/repositories/workout-plan.repository';
 
 export interface ListExercisesByPlanInput {
   userId: string;
@@ -48,28 +49,21 @@ export class ListExercisesByPlanUseCase {
     private readonly exerciseRepository: ExerciseRepository,
   ) {}
 
-  async execute(
-    input: ListExercisesByPlanInput,
-  ): Promise<ListExercisesByPlanOutput> {
+  async execute(input: ListExercisesByPlanInput): Promise<ListExercisesByPlanOutput> {
     const { userId, workoutPlanId } = input;
 
     // Validar entrada
     this.validateInput(input);
 
     // Verificar se o plano existe e pertence ao usuário
-    const workoutPlan = await this.workoutPlanRepository.findByIdAndUserId(
-      workoutPlanId,
-      userId,
-    );
+    const workoutPlan = await this.workoutPlanRepository.findByIdAndUserId(workoutPlanId, userId);
 
     if (!workoutPlan) {
       throw new Error('Plano de treino não encontrado');
     }
 
     // Buscar exercícios do plano
-    const exercises = await this.exerciseRepository.findByWorkoutPlanId(
-      workoutPlanId,
-    );
+    const exercises = await this.exerciseRepository.findByWorkoutPlanId(workoutPlanId);
 
     // Converter para formato de lista
     const exerciseList: ExerciseListItem[] = exercises.map((exercise) => ({
@@ -92,17 +86,12 @@ export class ListExercisesByPlanUseCase {
     const averageRestTime =
       exercises.length > 0
         ? Math.round(
-            exercises.reduce((total, ex) => total + ex.restTimeSeconds, 0) /
-              exercises.length,
+            exercises.reduce((total, ex) => total + ex.restTimeSeconds, 0) / exercises.length,
           )
         : 0;
 
     const muscleGroups = [
-      ...new Set(
-        exercises
-          .map((ex) => ex.targetMuscleGroup)
-          .filter((group) => group !== null),
-      ),
+      ...new Set(exercises.map((ex) => ex.targetMuscleGroup).filter((group) => group !== null)),
     ].sort();
 
     const totalDurationSeconds = exercises.reduce(
