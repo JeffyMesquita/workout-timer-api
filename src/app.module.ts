@@ -6,6 +6,7 @@ import { SubscriptionController } from './presentation/subscription.controller';
 import { AuthController } from './presentation/auth.controller';
 import { WorkoutPlanController } from './presentation/workout-plan.controller';
 import { WorkoutSessionController } from './presentation/workout-session.controller';
+import { ExerciseExecutionController } from './presentation/exercise-execution.controller';
 import { GooglePlayClient } from './infrastructure/google-play/google-play.client';
 import { GooglePlayService } from './infrastructure/google-play/google-play.service';
 import { JwtServiceLocal } from './infrastructure/auth/jwt.service';
@@ -31,6 +32,11 @@ import {
 } from './application/use-cases/control-workout-session.usecase';
 import { PrismaExerciseRepository } from './infrastructure/database/repositories/prisma-exercise.repository';
 import { PrismaWorkoutSessionRepository } from './infrastructure/database/repositories/prisma-workout-session.repository';
+import { PrismaExerciseExecutionRepository } from './infrastructure/database/repositories/prisma-exercise-execution.repository';
+import { PrismaSetRepository } from './infrastructure/database/repositories/prisma-set.repository';
+import { StartExerciseExecutionUseCase } from './application/use-cases/start-exercise-execution.usecase';
+import { CompleteSetUseCase } from './application/use-cases/complete-set.usecase';
+import { FinishExerciseExecutionUseCase } from './application/use-cases/finish-exercise-execution.usecase';
 import { WorkoutLimitServiceImpl } from './domain/services/workout-limit.service';
 
 @Module({
@@ -40,6 +46,7 @@ import { WorkoutLimitServiceImpl } from './domain/services/workout-limit.service
     AuthController,
     WorkoutPlanController,
     WorkoutSessionController,
+    ExerciseExecutionController,
   ],
   providers: [
     PrismaService,
@@ -65,6 +72,14 @@ import { WorkoutLimitServiceImpl } from './domain/services/workout-limit.service
       useClass: PrismaWorkoutSessionRepository,
     },
     {
+      provide: 'ExerciseExecutionRepository',
+      useClass: PrismaExerciseExecutionRepository,
+    },
+    {
+      provide: 'SetRepository',
+      useClass: PrismaSetRepository,
+    },
+    {
       provide: 'WorkoutLimitService',
       useClass: WorkoutLimitServiceImpl,
     },
@@ -82,6 +97,9 @@ import { WorkoutLimitServiceImpl } from './domain/services/workout-limit.service
     PauseWorkoutSessionUseCase,
     ResumeWorkoutSessionUseCase,
     CompleteWorkoutSessionUseCase,
+    StartExerciseExecutionUseCase,
+    CompleteSetUseCase,
+    FinishExerciseExecutionUseCase,
   ],
 })
 export class AppModule {}
