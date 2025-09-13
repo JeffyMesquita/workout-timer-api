@@ -9,13 +9,17 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  googleId      String?        @unique
-  appleSub      String?        @unique
-  email         String         @unique
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  subscriptions Subscription[]
+  id              String              @id @default(cuid())
+  googleId        String?             @unique
+  appleSub        String?             @unique
+  email           String              @unique
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  subscriptions   Subscription[]
+  workoutPlans    WorkoutPlan[]
+  workoutSessions WorkoutSession[]
+  trainerInvites  TrainerInvitation[] @relation("TrainerInvites")
+  studentInvites  TrainerInvitation[] @relation("StudentInvites")
 }
 
 model Subscription {
@@ -50,4 +54,136 @@ model SubscriptionEvent {
   subscription   Subscription @relation(fields: [subscriptionId], references: [id])
 
   @@index([subscriptionId, createdAt])
+}
+
+// === WORKOUT TIMER ENTITIES ===
+
+model WorkoutPlan {
+  id              String           @id @default(cuid())
+  userId          String
+  name            String // "Treino A", "Treino B", etc.
+  description     String?
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercises       Exercise[]
+  workoutSessions WorkoutSession[]
+
+  @@index([userId, createdAt])
+  @@index([userId, isActive])
+}
+
+model Exercise {
+  id                 String              @id @default(cuid())
+  workoutPlanId      String
+  name               String // "Supino reto", "Agachamento", etc.
+  description        String?
+  targetMuscleGroup  String? // "Peito", "Pernas", etc.
+  sets               Int                 @default(3)
+  reps               Int                 @default(10)
+  restTimeSeconds    Int                 @default(60)
+  order              Int // Ordem do exercício no treino
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  workoutPlan        WorkoutPlan         @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade)
+  exerciseExecutions ExerciseExecution[]
+
+  @@index([workoutPlanId, order])
+}
+
+model WorkoutSession {
+  id                 String               @id @default(cuid())
+  userId             String
+  workoutPlanId      String
+  status             WorkoutSessionStatus @default(IN_PROGRESS)
+  startedAt          DateTime             @default(now())
+  pausedAt           DateTime?
+  resumedAt          DateTime?
+  completedAt        DateTime?
+  cancelledAt        DateTime?
+  totalDurationMs    Int? // Duração total em millisegundos
+  notes              String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  user               User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workoutPlan        WorkoutPlan          @relation(fields: [workoutPlanId], references: [id])
+  exerciseExecutions ExerciseExecution[]
+
+  @@index([userId, startedAt])
+  @@index([workoutPlanId, startedAt])
+  @@index([status])
+}
+
+enum WorkoutSessionStatus {
+  IN_PROGRESS
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+model ExerciseExecution {
+  id               String          @id @default(cuid())
+  workoutSessionId String
+  exerciseId       String
+  status           ExecutionStatus @default(NOT_STARTED)
+  startedAt        DateTime?
+  completedAt      DateTime?
+  notes            String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  workoutSession   WorkoutSession  @relation(fields: [workoutSessionId], references: [id], onDelete: Cascade)
+  exercise         Exercise        @relation(fields: [exerciseId], references: [id])
+  sets             Set[]
+
+  @@index([workoutSessionId, exerciseId])
+}
+
+enum ExecutionStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+}
+
+model Set {
+  id                  String            @id @default(cuid())
+  exerciseExecutionId String
+  setNumber           Int // 1, 2, 3, etc.
+  plannedReps         Int
+  actualReps          Int?
+  weight              Float? // Peso em kg
+  restTimeSeconds     Int? // Tempo de descanso real
+  completedAt         DateTime?
+  notes               String?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  exerciseExecution   ExerciseExecution @relation(fields: [exerciseExecutionId], references: [id], onDelete: Cascade)
+
+  @@index([exerciseExecutionId, setNumber])
+}
+
+// === FUTURE: TRAINER FUNCTIONALITY ===
+
+model TrainerInvitation {
+  id        String           @id @default(cuid())
+  trainerId String
+  studentId String
+  status    InvitationStatus @default(PENDING)
+  message   String?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  trainer   User             @relation("TrainerInvites", fields: [trainerId], references: [id])
+  student   User             @relation("StudentInvites", fields: [studentId], references: [id])
+
+  @@unique([trainerId, studentId])
+  @@index([trainerId, status])
+  @@index([studentId, status])
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  CANCELLED
 }
