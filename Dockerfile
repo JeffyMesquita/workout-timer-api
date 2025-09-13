@@ -11,7 +11,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 
 # Instalar dependências
-RUN --mount=type=cache,target=/root/.pnpm-store pnpm install --frozen-lockfile
+RUN --mount=type=cache,target=/root/.pnpm-store pnpm install --no-frozen-lockfile
 
 # Copiar código fonte
 COPY . .
@@ -45,7 +45,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 
 # Instalar apenas dependências de produção
-RUN --mount=type=cache,target=/root/.pnpm-store pnpm install --frozen-lockfile --prod
+RUN --mount=type=cache,target=/root/.pnpm-store pnpm install --no-frozen-lockfile --prod
 
 # Copiar código buildado e arquivos necessários
 COPY --from=base /app/dist ./dist

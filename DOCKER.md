@@ -165,6 +165,27 @@ docker-compose down
 docker-compose up --build
 ```
 
+### Problema: Incompatibilidade de versões do Fastify
+
+Se você encontrar erros como "fastify-plugin: @fastify/cors - expected '5.x' fastify version":
+
+**Windows:**
+
+```powershell
+.\scripts\update-deps.ps1
+docker-compose up --build -d
+```
+
+**Linux/macOS:**
+
+```bash
+# Remover dependências antigas
+rm -rf node_modules pnpm-lock.yaml
+pnpm install
+pnpm prisma:generate
+docker-compose up --build -d
+```
+
 ### Problema: Banco de dados não conecta
 
 ```bash
