@@ -1,6 +1,9 @@
 # Use Node.js 20 Alpine como base
 FROM node:20-alpine AS base
 
+# Instalar dependências necessárias para Prisma no Alpine
+RUN apk add --no-cache openssl libc6-compat
+
 # Instalar pnpm globalmente
 RUN npm install -g pnpm@10.0.0
 
@@ -30,6 +33,9 @@ RUN rm .env
 
 # Estágio de produção
 FROM node:20-alpine AS production
+
+# Instalar dependências necessárias para Prisma no Alpine
+RUN apk add --no-cache openssl libc6-compat
 
 # Instalar pnpm globalmente
 RUN npm install -g pnpm@10.0.0

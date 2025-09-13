@@ -203,6 +203,22 @@ docker-compose logs postgres
 docker-compose exec api pnpm prisma:migrate reset
 ```
 
+### Problema: Prisma Engine não funciona no Alpine Linux
+
+Se você encontrar erros como "Error loading shared library libssl.so.1.1":
+
+```bash
+# Reconstruir containers com as dependências SSL
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+**Correções aplicadas:**
+
+- Instalação de `openssl1.1-compat` e `libc6-compat` no Alpine
+- Configuração de `binaryTargets = ["native", "linux-musl"]` no Prisma
+- Suporte completo para containers Alpine Linux
+
 ## 📊 Monitoramento
 
 ### Health Checks
