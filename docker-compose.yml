@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  # Banco de dados PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: workout-timer-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: workout_timer
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - workout-timer-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d workout_timer']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Aplicação NestJS
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: workout-timer-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/workout_timer?schema=public
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      JWT_REFRESH_SECRET: your-super-secret-jwt-refresh-key-change-in-production
+      JWT_EXPIRES_IN: 15m
+      JWT_REFRESH_EXPIRES_IN: 30d
+      GOOGLE_CLIENT_ID: your-google-client-id
+      GOOGLE_CLIENT_SECRET: your-google-client-secret
+      APPLE_CLIENT_ID: your-apple-client-id
+      APPLE_TEAM_ID: your-apple-team-id
+      APPLE_KEY_ID: your-apple-key-id
+      APPLE_PRIVATE_KEY: your-apple-private-key
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - workout-timer-network
+    volumes:
+      - ./logs:/app/logs
+
+  # Redis para cache e rate limiting (opcional)
+  redis:
+    image: redis:7-alpine
+    container_name: workout-timer-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - workout-timer-network
+    command: redis-server --appendonly yes
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  workout-timer-network:
+    driver: bridge

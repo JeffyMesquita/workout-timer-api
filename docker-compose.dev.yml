@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # Banco de dados PostgreSQL para desenvolvimento
+  postgres:
+    image: postgres:15-alpine
+    container_name: workout-timer-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: workout_timer_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - workout-timer-dev-network
+
+  # Redis para desenvolvimento
+  redis:
+    image: redis:7-alpine
+    container_name: workout-timer-redis-dev
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - workout-timer-dev-network
+    command: redis-server --appendonly yes
+
+volumes:
+  postgres_dev_data:
+    driver: local
+  redis_dev_data:
+    driver: local
+
+networks:
+  workout-timer-dev-network:
+    driver: bridge

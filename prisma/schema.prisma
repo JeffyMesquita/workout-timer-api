@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  googleId      String?        @unique
+  appleSub      String?        @unique
+  email         String         @unique
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id            String              @id @default(cuid())
+  userId        String
+  productId     String
+  purchaseToken String              @unique
+  status        SubscriptionStatus
+  expiryDate    DateTime
+  acknowledged  Boolean             @default(false)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  user          User                @relation(fields: [userId], references: [id])
+  events        SubscriptionEvent[]
+
+  @@index([userId, createdAt])
+}
+
+enum SubscriptionStatus {
+  active
+  expired
+  canceled
+  pending
+}
+
+model SubscriptionEvent {
+  id             String       @id @default(cuid())
+  subscriptionId String
+  type           String
+  payload        Json
+  createdAt      DateTime     @default(now())
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+
+  @@index([subscriptionId, createdAt])
+}
