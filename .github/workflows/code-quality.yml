@@ -1,6 +1,9 @@
 name: 📊 Code Quality Analysis
 
 on:
+  workflow_run:
+    workflows: ["🧪 Continuous Integration"]
+    types: [completed]
   push:
     branches: [main, master, develop]
   pull_request:

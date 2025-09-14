@@ -1,6 +1,9 @@
 name: 🔒 Security Checks
 
 on:
+  workflow_run:
+    workflows: ["📊 Code Quality Analysis"]
+    types: [completed]
   push:
     branches: [main, master, develop]
   pull_request:

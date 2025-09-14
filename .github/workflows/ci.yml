@@ -1,6 +1,9 @@
 name: 🧪 Continuous Integration
 
 on:
+  workflow_run:
+    workflows: ["✅ Basic CI"]
+    types: [completed]
   push:
     branches: [main, master, develop]
   pull_request:

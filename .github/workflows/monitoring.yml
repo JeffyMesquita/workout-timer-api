@@ -1,6 +1,10 @@
 name: 📊 Monitoring & Health Checks
 
 on:
+  workflow_run:
+    workflows: ["🚀 Continuous Deployment"]
+    types: [completed]
+    branches: [main, master]
   schedule:
     - cron: '0 */6 * * *' # Every 6 hours
   workflow_dispatch: # Manual trigger

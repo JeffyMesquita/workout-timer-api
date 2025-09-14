@@ -1,6 +1,10 @@
 name: 🚀 Continuous Deployment
 
 on:
+  workflow_run:
+    workflows: ["🔒 Security Checks"]
+    types: [completed]
+    branches: [main, master]
   push:
     branches: [main, master]
     tags: ['v*']
