@@ -10,7 +10,7 @@ on:
 
 env:
   NODE_VERSION: '20'
-  PNPM_VERSION: '9'
+  PNPM_VERSION: '9.12.3'
 
 jobs:
   # Job 1: Test Coverage Analysis
