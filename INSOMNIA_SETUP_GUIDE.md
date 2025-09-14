@@ -6,7 +6,7 @@
 
 1. Abra o **Insomnia**
 2. Clique em **"Create"** → **"Import from"** → **"File"**
-3. Selecione o arquivo `insomnia-collection.json`
+3. Selecione o arquivo `insomnia-workspace.json` (use este arquivo)
 4. A coleção será importada com todas as rotas organizadas! 🎉
 
 ### **2. Configurar Environment**
