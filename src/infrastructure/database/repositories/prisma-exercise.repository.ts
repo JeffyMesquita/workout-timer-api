@@ -22,7 +22,7 @@ export class PrismaExerciseRepository implements ExerciseRepository {
       orderBy: { order: 'asc' },
     });
 
-    return exercises.map((exercise) => this.toDomainEntity(exercise));
+    return exercises.map((exercise: any) => this.toDomainEntity(exercise));
   }
 
   async countByWorkoutPlanId(workoutPlanId: string): Promise<number> {
@@ -126,7 +126,7 @@ export class PrismaExerciseRepository implements ExerciseRepository {
       orderBy: { order: 'asc' },
     });
 
-    return exercises.map((exercise) => this.toDomainEntity(exercise));
+    return exercises.map((exercise: any) => this.toDomainEntity(exercise));
   }
 
   async getNextOrderByWorkoutPlanId(workoutPlanId: string): Promise<number> {

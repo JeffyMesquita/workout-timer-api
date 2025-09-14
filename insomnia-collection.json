@@ -1,0 +1,1090 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-01-14T12:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "req_auth_google",
+      "parentId": "fld_auth",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/auth/google",
+      "name": "🔐 Login Google",
+      "description": "Autentica usuário usando ID Token do Google OAuth",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"idToken\": \"{{ _.google_id_token }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_auth_apple",
+      "parentId": "fld_auth",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/auth/apple",
+      "name": "🍎 Login Apple",
+      "description": "Autentica usuário usando ID Token da Apple Sign In",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"idToken\": \"{{ _.apple_id_token }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_auth_refresh",
+      "parentId": "fld_auth",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/auth/refresh",
+      "name": "🔄 Refresh Token",
+      "description": "Renova o access token usando refresh token",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"refreshToken\": \"{{ _.refresh_token }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_subscription_activate",
+      "parentId": "fld_subscriptions",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/subscriptions/activate",
+      "name": "💳 Ativar Assinatura",
+      "description": "Ativa assinatura premium via Google Play Store",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"productId\": \"premium_monthly\",\n  \"purchaseToken\": \"{{ _.purchase_token }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_subscription_restore",
+      "parentId": "fld_subscriptions",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/subscriptions/restore",
+      "name": "🔄 Restaurar Assinatura",
+      "description": "Restaura assinatura premium existente",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_subscription_status",
+      "parentId": "fld_subscriptions",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/subscriptions/status",
+      "name": "📊 Status Premium",
+      "description": "Verifica status da assinatura premium",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_workout_plans_create",
+      "parentId": "fld_workout_plans",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/workout-plans",
+      "name": "➕ Criar Plano de Treino",
+      "description": "Cria um novo plano de treino",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Treino A - Peito e Tríceps\",\n  \"description\": \"Foco em exercícios de peito e tríceps\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_workout_plans_list",
+      "parentId": "fld_workout_plans",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/workout-plans?page=1&limit=10&search=&activeOnly=true",
+      "name": "📋 Listar Planos",
+      "description": "Lista todos os planos de treino do usuário",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1",
+          "description": "Página atual"
+        },
+        {
+          "name": "limit",
+          "value": "10",
+          "description": "Itens por página"
+        },
+        {
+          "name": "search",
+          "value": "",
+          "description": "Busca por nome"
+        },
+        {
+          "name": "activeOnly",
+          "value": "true",
+          "description": "Apenas planos ativos"
+        }
+      ],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_workout_plans_get",
+      "parentId": "fld_workout_plans",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/workout-plans/{{ _.workout_plan_id }}",
+      "name": "🔍 Buscar Plano",
+      "description": "Busca um plano de treino específico",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_workout_plans_update",
+      "parentId": "fld_workout_plans",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/workout-plans/{{ _.workout_plan_id }}",
+      "name": "✏️ Atualizar Plano",
+      "description": "Atualiza um plano de treino existente",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Treino A - Peito e Tríceps (Atualizado)\",\n  \"description\": \"Foco em exercícios de peito e tríceps - versão melhorada\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_workout_plans_delete",
+      "parentId": "fld_workout_plans",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/workout-plans/{{ _.workout_plan_id }}?force=true",
+      "name": "🗑️ Deletar Plano",
+      "description": "Remove um plano de treino",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [
+        {
+          "name": "force",
+          "value": "true",
+          "description": "Forçar exclusão mesmo com exercícios"
+        }
+      ],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_exercises_list",
+      "parentId": "fld_exercises",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/workout-plans/{{ _.workout_plan_id }}/exercises",
+      "name": "💪 Listar Exercícios",
+      "description": "Lista exercícios de um plano de treino",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_exercises_add",
+      "parentId": "fld_exercises",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/workout-plans/{{ _.workout_plan_id }}/exercises",
+      "name": "➕ Adicionar Exercício",
+      "description": "Adiciona exercício a um plano de treino",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Supino Reto\",\n  \"description\": \"Exercício para peito\",\n  \"sets\": 3,\n  \"reps\": 10,\n  \"restTimeSeconds\": 60\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_workout_sessions_start",
+      "parentId": "fld_workout_sessions",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/workout-sessions/start",
+      "name": "▶️ Iniciar Treino",
+      "description": "Inicia uma nova sessão de treino",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"workoutPlanId\": \"{{ _.workout_plan_id }}\",\n  \"notes\": \"Treino de hoje - foco em peito\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_workout_sessions_pause",
+      "parentId": "fld_workout_sessions",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/workout-sessions/{{ _.workout_session_id }}/pause",
+      "name": "⏸️ Pausar Treino",
+      "description": "Pausa a sessão de treino atual",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"notes\": \"Pausa para descanso\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_workout_sessions_resume",
+      "parentId": "fld_workout_sessions",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/workout-sessions/{{ _.workout_session_id }}/resume",
+      "name": "▶️ Retomar Treino",
+      "description": "Retoma a sessão de treino pausada",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_workout_sessions_complete",
+      "parentId": "fld_workout_sessions",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/workout-sessions/{{ _.workout_session_id }}/complete",
+      "name": "✅ Finalizar Treino",
+      "description": "Finaliza a sessão de treino",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"notes\": \"Treino finalizado com sucesso!\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_workout_sessions_cancel",
+      "parentId": "fld_workout_sessions",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/workout-sessions/{{ _.workout_session_id }}/cancel",
+      "name": "❌ Cancelar Treino",
+      "description": "Cancela a sessão de treino",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"reason\": \"Cancelado por motivos pessoais\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_workout_sessions_active",
+      "parentId": "fld_workout_sessions",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/workout-sessions/active",
+      "name": "🔍 Treino Ativo",
+      "description": "Busca sessão de treino ativa",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_workout_sessions_get",
+      "parentId": "fld_workout_sessions",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/workout-sessions/{{ _.workout_session_id }}",
+      "name": "📊 Detalhes do Treino",
+      "description": "Busca detalhes de uma sessão de treino",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_exercise_executions_start",
+      "parentId": "fld_exercise_executions",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/exercise-executions/start",
+      "name": "▶️ Iniciar Exercício",
+      "description": "Inicia execução de um exercício",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"workoutSessionId\": \"{{ _.workout_session_id }}\",\n  \"exerciseId\": \"{{ _.exercise_id }}\",\n  \"startingWeight\": 50\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_exercise_executions_complete_set",
+      "parentId": "fld_exercise_executions",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/exercise-executions/{{ _.exercise_execution_id }}/complete-set",
+      "name": "⚖️ Completar Série",
+      "description": "Completa uma série com peso e repetições",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"setNumber\": 1,\n  \"actualReps\": 10,\n  \"weight\": 50,\n  \"restTimeSeconds\": 60,\n  \"notes\": \"Série executada com boa forma\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_exercise_executions_finish",
+      "parentId": "fld_exercise_executions",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/exercise-executions/{{ _.exercise_execution_id }}/finish",
+      "name": "✅ Finalizar Exercício",
+      "description": "Finaliza execução de um exercício",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"forceComplete\": false\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_exercise_executions_get",
+      "parentId": "fld_exercise_executions",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/exercise-executions/{{ _.exercise_execution_id }}",
+      "name": "🔍 Detalhes da Execução",
+      "description": "Busca detalhes de uma execução de exercício",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_exercise_executions_sets",
+      "parentId": "fld_exercise_executions",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/exercise-executions/{{ _.exercise_execution_id }}/sets",
+      "name": "📊 Séries do Exercício",
+      "description": "Lista séries de uma execução de exercício",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_exercise_executions_history",
+      "parentId": "fld_exercise_executions",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/exercise-executions/{{ _.exercise_id }}/history",
+      "name": "📈 Histórico do Exercício",
+      "description": "Busca histórico de execuções de um exercício",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_sets_update_weight",
+      "parentId": "fld_sets",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/sets/{{ _.set_id }}/weight",
+      "name": "⚖️ Atualizar Peso",
+      "description": "Atualiza peso de uma série",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"weight\": 55\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_health_check",
+      "parentId": "fld_health",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/health",
+      "name": "🏥 Health Check",
+      "description": "Verifica se a API está funcionando",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_health_database",
+      "parentId": "fld_health",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "url": "{{ _.base_url }}/health/database",
+      "name": "🗄️ Database Health",
+      "description": "Verifica conexão com o banco de dados",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1705233600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_auth",
+      "parentId": "wrk_workout_timer_api",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "name": "🔐 Autenticação",
+      "description": "Endpoints de autenticação Google/Apple",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1705233600000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_subscriptions",
+      "parentId": "wrk_workout_timer_api",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "name": "💳 Assinaturas",
+      "description": "Sistema de assinaturas premium",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1705233600000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_workout_plans",
+      "parentId": "wrk_workout_timer_api",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "name": "🏋️‍♂️ Planos de Treino",
+      "description": "Gestão de planos de treino",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1705233600000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_exercises",
+      "parentId": "wrk_workout_timer_api",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "name": "💪 Exercícios",
+      "description": "Gestão de exercícios",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1705233600000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_workout_sessions",
+      "parentId": "wrk_workout_timer_api",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "name": "⏱️ Sessões de Treino",
+      "description": "Execução de treinos",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1705233600000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_exercise_executions",
+      "parentId": "wrk_workout_timer_api",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "name": "🏋️‍♂️ Execução de Exercícios",
+      "description": "Execução individual de exercícios",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1705233600000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_sets",
+      "parentId": "wrk_workout_timer_api",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "name": "⚖️ Séries e Pesos",
+      "description": "Gestão de séries e pesos",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1705233600000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_health",
+      "parentId": "wrk_workout_timer_api",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "name": "🏥 Health Checks",
+      "description": "Verificação de saúde da API",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1705233600000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "wrk_workout_timer_api",
+      "parentId": null,
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "name": "🏋️‍♂️ Workout Timer API",
+      "description": "API completa para aplicativo de cronômetro de treino com registro de pesos e progressão",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_base",
+      "parentId": "wrk_workout_timer_api",
+      "modified": 1705233600000,
+      "created": 1705233600000,
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:3000",
+        "access_token": "",
+        "refresh_token": "",
+        "google_id_token": "",
+        "apple_id_token": "",
+        "purchase_token": "",
+        "workout_plan_id": "",
+        "workout_session_id": "",
+        "exercise_id": "",
+        "exercise_execution_id": "",
+        "set_id": ""
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url",
+          "access_token",
+          "refresh_token",
+          "google_id_token",
+          "apple_id_token",
+          "purchase_token",
+          "workout_plan_id",
+          "workout_session_id",
+          "exercise_id",
+          "exercise_execution_id",
+          "set_id"
+        ]
+      },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 1705233600000,
+      "_type": "environment"
+    }
+  ]
+}

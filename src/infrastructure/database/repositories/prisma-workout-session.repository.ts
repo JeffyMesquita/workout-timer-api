@@ -33,7 +33,7 @@ export class PrismaWorkoutSessionRepository implements WorkoutSessionRepository 
       orderBy: { startedAt: 'desc' },
     });
 
-    return sessions.map((session) => this.toDomainEntity(session));
+    return sessions.map((session: any) => this.toDomainEntity(session));
   }
 
   async findActiveByUserId(userId: string): Promise<WorkoutSession | null> {
@@ -55,7 +55,7 @@ export class PrismaWorkoutSessionRepository implements WorkoutSessionRepository 
       orderBy: { startedAt: 'desc' },
     });
 
-    return sessions.map((session) => this.toDomainEntity(session));
+    return sessions.map((session: any) => this.toDomainEntity(session));
   }
 
   async findByUserIdWithPagination(
@@ -91,7 +91,7 @@ export class PrismaWorkoutSessionRepository implements WorkoutSessionRepository 
     ]);
 
     return {
-      sessions: sessions.map((session) => this.toDomainEntity(session)),
+      sessions: sessions.map((session: any) => this.toDomainEntity(session)),
       total,
       page,
       limit,
@@ -194,7 +194,7 @@ export class PrismaWorkoutSessionRepository implements WorkoutSessionRepository 
       orderBy: { startedAt: 'desc' },
     });
 
-    return sessions.map((session) => this.toDomainEntity(session));
+    return sessions.map((session: any) => this.toDomainEntity(session));
   }
 
   async getSessionStats(userId: string): Promise<{

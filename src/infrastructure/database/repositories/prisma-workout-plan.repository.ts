@@ -49,7 +49,7 @@ export class PrismaWorkoutPlanRepository implements WorkoutPlanRepository {
       orderBy: { createdAt: 'desc' },
     });
 
-    return plans.map((plan) => this.toDomainEntity(plan));
+    return plans.map((plan: any) => this.toDomainEntity(plan));
   }
 
   async findActiveByUserId(userId: string): Promise<WorkoutPlan[]> {
@@ -66,7 +66,7 @@ export class PrismaWorkoutPlanRepository implements WorkoutPlanRepository {
       orderBy: { createdAt: 'desc' },
     });
 
-    return plans.map((plan) => this.toDomainEntity(plan));
+    return plans.map((plan: any) => this.toDomainEntity(plan));
   }
 
   async countByUserId(userId: string): Promise<number> {
@@ -201,7 +201,7 @@ export class PrismaWorkoutPlanRepository implements WorkoutPlanRepository {
     ]);
 
     return {
-      plans: plans.map((plan) => this.toDomainEntity(plan)),
+      plans: plans.map((plan: any) => this.toDomainEntity(plan)),
       total,
       page,
       limit,
@@ -227,7 +227,7 @@ export class PrismaWorkoutPlanRepository implements WorkoutPlanRepository {
       orderBy: { createdAt: 'desc' },
     });
 
-    return plans.map((plan) => this.toDomainEntity(plan));
+    return plans.map((plan: any) => this.toDomainEntity(plan));
   }
 
   /**

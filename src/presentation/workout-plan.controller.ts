@@ -12,6 +12,7 @@ import {
   HttpStatus,
   HttpException,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 
 import {
   AddExerciseToWorkoutPlanUseCase,
@@ -72,6 +73,8 @@ export class AddExerciseDto {
   restTimeSeconds?: number = 60;
 }
 
+@ApiTags('workout-plans')
+@ApiBearerAuth('JWT-auth')
 @Controller('workout-plans')
 @UseGuards(JwtAuthGuard)
 export class WorkoutPlanController {
@@ -90,6 +93,55 @@ export class WorkoutPlanController {
   }
 
   @Post()
+  @ApiOperation({
+    summary: 'Criar plano de treino',
+    description: 'Cria um novo plano de treino para o usuário autenticado',
+  })
+  @ApiBody({
+    description: 'Dados do plano de treino',
+    schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Nome do plano de treino',
+          example: 'Treino A - Peito e Tríceps',
+          minLength: 1,
+          maxLength: 100,
+        },
+        description: {
+          type: 'string',
+          description: 'Descrição opcional do plano',
+          example: 'Foco em exercícios de peito e tríceps',
+          maxLength: 500,
+        },
+      },
+      required: ['name'],
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Plano de treino criado com sucesso',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            name: { type: 'string' },
+            description: { type: 'string' },
+            isActive: { type: 'boolean' },
+            createdAt: { type: 'string', format: 'date-time' },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Dados inválidos' })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
+  @ApiResponse({ status: 403, description: 'Limite de planos excedido (free tier)' })
   async create(@Req() req: any, @Body() dto: CreateWorkoutPlanDto) {
     try {
       const input: CreateWorkoutPlanInput = {

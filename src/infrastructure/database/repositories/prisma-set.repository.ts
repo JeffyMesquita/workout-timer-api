@@ -22,7 +22,7 @@ export class PrismaSetRepository implements SetRepository {
       orderBy: { setNumber: 'asc' },
     });
 
-    return sets.map((set) => this.toDomainEntity(set));
+    return sets.map((set: any) => this.toDomainEntity(set));
   }
 
   async findByExerciseExecutionIdAndSetNumber(
@@ -112,7 +112,7 @@ export class PrismaSetRepository implements SetRepository {
       orderBy: { setNumber: 'asc' },
     });
 
-    return sets.map((set) => this.toDomainEntity(set));
+    return sets.map((set: any) => this.toDomainEntity(set));
   }
 
   async findLastByExerciseId(exerciseId: string): Promise<WorkoutSet | null> {
@@ -196,7 +196,7 @@ export class PrismaSetRepository implements SetRepository {
       }),
     ]);
 
-    const totalSets = counts.reduce((sum, group) => sum + group._count.id, 0);
+    const totalSets = counts.reduce((sum: any, group: any) => sum + group._count.id, 0);
     const completedSets = await this.prisma.set.count({
       where: {
         exerciseExecution: { exerciseId },
@@ -206,12 +206,12 @@ export class PrismaSetRepository implements SetRepository {
 
     // Calcular volume total
     const totalVolume = progressionSets.reduce(
-      (sum, set) => sum + (set.weight || 0) * (set.actualReps || 0),
+      (sum: any, set: any) => sum + (set.weight || 0) * (set.actualReps || 0),
       0,
     );
 
     // Preparar dados de progressão
-    const progressionData = progressionSets.map((set) => ({
+    const progressionData = progressionSets.map((set: any) => ({
       date: set.exerciseExecution.completedAt || set.createdAt,
       weight: set.weight,
       reps: set.actualReps || 0,
@@ -272,7 +272,7 @@ export class PrismaSetRepository implements SetRepository {
       },
     });
 
-    return sets.map((set) => ({
+    return sets.map((set: any) => ({
       date: set.exerciseExecution.completedAt || set.createdAt,
       weight: set.weight,
       reps: set.actualReps || 0,
@@ -285,7 +285,7 @@ export class PrismaSetRepository implements SetRepository {
     const savedSets: WorkoutSet[] = [];
 
     // Usar transação para garantir consistência
-    await this.prisma.$transaction(async (tx) => {
+    await this.prisma.$transaction(async (tx: any) => {
       for (const set of sets) {
         const savedSet = await tx.set.create({
           data: {

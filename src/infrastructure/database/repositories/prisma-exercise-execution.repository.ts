@@ -33,7 +33,7 @@ export class PrismaExerciseExecutionRepository implements ExerciseExecutionRepos
       orderBy: { createdAt: 'asc' },
     });
 
-    return executions.map((execution) => this.toDomainEntity(execution));
+    return executions.map((execution: any) => this.toDomainEntity(execution));
   }
 
   async findByWorkoutSessionIdAndExerciseId(
@@ -66,7 +66,7 @@ export class PrismaExerciseExecutionRepository implements ExerciseExecutionRepos
       orderBy: { createdAt: 'desc' },
     });
 
-    return executions.map((execution) => this.toDomainEntity(execution));
+    return executions.map((execution: any) => this.toDomainEntity(execution));
   }
 
   async findActiveByWorkoutSessionId(workoutSessionId: string): Promise<ExerciseExecution[]> {
@@ -82,7 +82,7 @@ export class PrismaExerciseExecutionRepository implements ExerciseExecutionRepos
       },
     });
 
-    return executions.map((execution) => this.toDomainEntity(execution));
+    return executions.map((execution: any) => this.toDomainEntity(execution));
   }
 
   async save(execution: ExerciseExecution): Promise<ExerciseExecution> {
@@ -198,7 +198,7 @@ export class PrismaExerciseExecutionRepository implements ExerciseExecutionRepos
     ]);
 
     return {
-      executions: executions.map((execution) => this.toDomainEntity(execution)),
+      executions: executions.map((execution: any) => this.toDomainEntity(execution)),
       total,
       page,
       limit,
