@@ -19,6 +19,6 @@ pnpm type-check
 
 # Run unit tests for changed files
 echo "🧪 Running unit tests..."
-pnpm test:unit --passWithNoTests
+pnpm test:unit-only --passWithNoTests
 
 echo "✅ Pre-commit checks completed successfully!"

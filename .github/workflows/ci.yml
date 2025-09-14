@@ -93,6 +93,10 @@ jobs:
           rm .env
 
       - name: 🧪 Run unit tests
+        env:
+          DATABASE_URL: postgresql://temp:temp@temp:5432/temp
+          JWT_SECRET: test-jwt-secret-for-ci
+          JWT_REFRESH_SECRET: test-jwt-refresh-secret-for-ci
         run: pnpm test:unit
 
   # Job 3: Build Test

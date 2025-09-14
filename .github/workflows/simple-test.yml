@@ -19,5 +19,5 @@ jobs:
       - run: echo 'DATABASE_URL="postgresql://temp:temp@temp:5432/temp"' > .env
       - run: pnpm prisma generate
       - run: rm .env
-      - run: pnpm test:unit
+      - run: pnpm test:unit-only
       - run: echo "✅ Tests passed!"

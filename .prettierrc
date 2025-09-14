@@ -9,7 +9,6 @@
   "bracketSameLine": false,
   "arrowParens": "always",
   "endOfLine": "lf",
-  "insertFinalNewline": true,
   "quoteProps": "as-needed",
   "jsxSingleQuote": true,
   "overrides": [

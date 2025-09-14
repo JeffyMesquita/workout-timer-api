@@ -43,7 +43,11 @@ jobs:
           rm .env
 
       - name: 📊 Generate detailed coverage
-        run: pnpm test:coverage
+        env:
+          DATABASE_URL: postgresql://temp:temp@temp:5432/temp
+          JWT_SECRET: test-jwt-secret-for-ci
+          JWT_REFRESH_SECRET: test-jwt-refresh-secret-for-ci
+        run: pnpm test:unit-only --coverage
 
       - name: 📈 Coverage threshold check
         run: |
